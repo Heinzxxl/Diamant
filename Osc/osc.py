@@ -12,6 +12,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.isRunning = True
+        
+        self.RSButton.clicked.connect(self.rschange)
 
     def addfig(self, fig):
         self.canvas = FigureCanvas(fig)
@@ -20,6 +23,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
+    
+    def rschange(self):
+        if self.isRunning:
+            self.rsLabel.setText('Stop')
+            self.isRunning = False
+        else:
+            self.rsLabel.setText('Run')
+            self.isRunning = True
 
 
 fig1 = Figure()
