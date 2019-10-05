@@ -13,7 +13,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.isRunning = True
-        
         self.RSButton.clicked.connect(self.rschange)
 
     def addfig(self, fig):
@@ -23,14 +22,35 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
-    
+
+    # function for button disconnection
+    def cldisconnect(self, button):
+        try:
+            self.button.clicked.disconnect()
+        except Exception:
+            pass
+
+    # temp function for testing
     def rschange(self):
         if self.isRunning:
             self.rsLabel.setText('Stop')
+            self.cldisconnect(self.thatButton1)
+            self.thatButton1.clicked.connect(self.tempslot1)
             self.isRunning = False
         else:
             self.rsLabel.setText('Run')
+            self.cldisconnect(self.thatButton1)
+            self.thatButton1.clicked.connect(self.tempslot2)
             self.isRunning = True
+
+    # temp function for testing
+    def tempslot1(self):
+        self.thatButton2.setText("Push me")
+        self.thatButton3.setText("")
+
+    def tempslot2(self):
+        self.thatButton2.setText("")
+        self.thatButton3.setText("Push me")
 
 
 fig1 = Figure()
