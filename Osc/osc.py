@@ -203,7 +203,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def tgslot1(self):
         self._tgType = self.dynBox1.currentText()
         self.cldisconnect6()
-        self.hldisconnect6()
         self.dynBox6.clear()
         self.dynLabel6.clear()
         self.tgchange6()
