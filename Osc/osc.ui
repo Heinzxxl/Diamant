@@ -111,307 +111,350 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>0</number>
+     <widget class="QFrame" name="dynFrame">
+      <property name="styleSheet">
+       <string notr="true">QFrame#dynFrame {
+border-top: 3px solid blue;
+border-bottom: 3px solid blue;
+}</string>
       </property>
-      <property name="leftMargin">
-       <number>0</number>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <item>
-       <widget class="QLabel" name="dynLabel1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} </string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel4">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox4">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel5">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox5">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel6">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox6">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel7">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox7">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel8">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox8">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel9">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox9">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="dynLabel10">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{background:rgb(225, 225, 225)}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="dynBox10">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;}</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="PushLabel" name="dynLabel1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225);}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel6">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox6">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel7">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox7">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel9">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox9">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PushLabel" name="dynLabel10">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ModComboBox" name="dynBox10">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox::drop-down {border-width: 0px;} QComboBox::down-arrow {image: none; border-width: 0px;} 
+QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);};</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout_2">
@@ -1470,6 +1513,18 @@ QPushButton:pressed {
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PushLabel</class>
+   <extends>QLabel</extends>
+   <header>pushlabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ModComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">modcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <designerdata>
