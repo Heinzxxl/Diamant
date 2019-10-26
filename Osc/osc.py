@@ -24,7 +24,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.cl9 = False
         self.cl10 = False
 
+        self.lcl1 = False
+        self.lcl2 = False
+        self.lcl3 = False
+        self.lcl4 = False
+        self.lcl5 = False
+        self.lcl6 = False
+        self.lcl7 = False
+        self.lcl8 = False
+        self.lcl9 = False
+        self.lcl10 = False
+
+        # Run/Stop condition
         self._Run = True
+        # Trigger conditions
         self._tgType = "Edge"
         self._tgMode = "Auto"
         self._tgRLength = "2K (20 us)"
@@ -32,6 +45,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._tgSlope = "Rising"
         self._tgVideo = "Scan Line"
         self._tgDelay = "Off"
+        # Utility conditions
+        self._utLang = "English"
+        self._utlPage = "Next Page"
 
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
@@ -104,6 +120,57 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.dynBox10.activated.disconnect()
             self.cl10 = False
 
+    # pushlabel disconnection
+    def lcldisconnect1(self):
+        if self.lcl1:
+            self.dynLabel1.clicked.disconnect()
+            self.lcl1 = False
+
+    def lcldisconnect2(self):
+        if self.lcl2:
+            self.dynLabel2.clicked.disconnect()
+            self.lcl2 = False
+
+    def lcldisconnect3(self):
+        if self.lcl3:
+            self.dynLabel3.clicked.disconnect()
+            self.lcl3 = False
+
+    def lcldisconnect4(self):
+        if self.lcl4:
+            self.dynLabel4.clicked.disconnect()
+            self.lcl4 = False
+
+    def lcldisconnect5(self):
+        if self.lcl5:
+            self.dynLabel5.clicked.disconnect()
+            self.lcl5 = False
+
+    def lcldisconnect6(self):
+        if self.lcl6:
+            self.dynLabel6.clicked.disconnect()
+            self.lcl6 = False
+
+    def lcldisconnect7(self):
+        if self.lcl7:
+            self.dynLabel7.clicked.disconnect()
+            self.lcl7 = False
+
+    def lcldisconnect8(self):
+        if self.lcl8:
+            self.dynLabel8.clicked.disconnect()
+            self.lcl8 = False
+
+    def lcldisconnect9(self):
+        if self.lcl9:
+            self.dynLabel9.clicked.disconnect()
+            self.lcl9 = False
+
+    def lcldisconnect10(self):
+        if self.lcl10:
+            self.dynLabel10.clicked.disconnect()
+            self.lcl10 = False
+
     # dynamic buttons disconnection
     def alldyndisconnect(self):
         self.cldisconnect1()
@@ -116,6 +183,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.cldisconnect8()
         self.cldisconnect9()
         self.cldisconnect10()
+        self.lcldisconnect1()
+        self.lcldisconnect2()
+        self.lcldisconnect3()
+        self.lcldisconnect4()
+        self.lcldisconnect5()
+        self.lcldisconnect6()
+        self.lcldisconnect7()
+        self.lcldisconnect8()
+        self.lcldisconnect9()
+        self.lcldisconnect10()
 
     # clear names of dynamic boxes
     def alldynclear(self):
@@ -139,6 +216,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.dynLabel8.clear()
         self.dynLabel9.clear()
         self.dynLabel10.clear()
+
+    # pop-up control with pushLabels
+    # under construction XD
+    def ppctrl1(self):
+        pass
 
     # function for Run/Stop
     def rschange(self):
@@ -185,13 +267,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # changing box6
     def tgchange6(self):
-        if str(self.dynBox1.currentText()) == "Edge":
+        if self._tgType == "Edge":
             self.dynLabel6.setText("Slope")
             self.dynBox6.addItems(["Rising", "Falling"])
             self.dynBox6.setCurrentText(self._tgSlope)
             self.dynBox6.activated.connect(self.tgslot6a)
             self.cl6 = True
-        if str(self.dynBox1.currentText()) == "Video":
+        if self._tgType == "Video":
             self.dynLabel6.setText("Video Trig On")
             self.dynBox6.addItems(["Scan Line", "Field",
                                    "Odd Field", "Even Field"])
@@ -203,6 +285,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def tgslot1(self):
         self._tgType = self.dynBox1.currentText()
         self.cldisconnect6()
+        self.lcldisconnect6()
         self.dynBox6.clear()
         self.dynLabel6.clear()
         self.tgchange6()
@@ -244,15 +327,32 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def utchange(self):
         self.alldyndisconnect()
         self.alldynclear()
-        self.dynBox1.activated.connect(self.utslot1)
-        self.cl1 = True
-        self.dynLabel1.setText("Languages")
-        self.dynBox1.addItems([""])
-        self.dynLabel2.setText("Languages")
-        self.dynBox2.addItems(["English", ])
+        self.dynLabel10.clicked.connect(self.utlslot10)
+        self.lcl10 = True
+        self.dynLabel10.setText(self._utlPage)
+        if self._utlPage == "Next Page":
+            self.dynBox1.activated.connect(self.utslot1a)
+            self.cl1 = True
+            self.dynLabel1.setText("Languages")
+            self.dynBox1.addItems(["English", "Russian"])
+            self.dynBox1.setCurrentText(self._utLang)
+        if self._utlPage == "Prior Page":
+            self.dynLabel1.setText("Product Information")
+            self.dynLabel1.clicked.connect(self.utlslot1b)
+            self.lcl10 = True
 
     # slots for Utility
-    def utslot1(self):
+    def utlslot10(self):
+        if self._utlPage == "Next Page":
+            self._utlPage = "Prior Page"
+        else:
+            self._utlPage = "Next Page"
+        self.utchange()
+
+    def utslot1a(self):
+        self._utLang = self.dynBox1.currentText()
+
+    def utlslot1b(self):
         pass
 
     # function for Save/Recall
