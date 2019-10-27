@@ -17,17 +17,28 @@
    <layout class="QHBoxLayout" name="horizontalLayout_8">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
-       <widget class="QLabel" name="label">
+      <item row="24" column="5" alignment="Qt::AlignRight|Qt::AlignBottom">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>M 200ns</string>
+         <string>0 V</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="4" alignment="Qt::AlignLeft|Qt::AlignTop">
-       <widget class="QLabel" name="label_3">
+      <item row="2" column="0" rowspan="22" colspan="6">
+       <widget class="QWidget" name="mplwidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QVBoxLayout" name="mplvl"/>
+       </widget>
+      </item>
+      <item row="1" column="5" alignment="Qt::AlignRight|Qt::AlignTop">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>T Pos: 50.00%</string>
+         <string>100 MS/s</string>
         </property>
        </widget>
       </item>
@@ -39,39 +50,19 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
-          <height>20</height>
+          <height>0</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item row="1" column="5" alignment="Qt::AlignRight|Qt::AlignTop">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>100 MS/s</string>
+         <string>M 200ns</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="5" alignment="Qt::AlignRight|Qt::AlignBottom">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>0 V</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="4" column="0" colspan="5" alignment="Qt::AlignLeft|Qt::AlignBottom">
+      <item row="24" column="0" colspan="5" alignment="Qt::AlignLeft|Qt::AlignBottom">
        <widget class="QLabel" name="label_5">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -84,6 +75,26 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="4" alignment="Qt::AlignLeft|Qt::AlignTop">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>T Pos: 50.00%</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="1" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
        <widget class="QLabel" name="rsLabel">
         <property name="sizePolicy">
@@ -95,17 +106,6 @@
         <property name="text">
          <string>Run</string>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0" rowspan="2" colspan="6">
-       <widget class="QWidget" name="mplwidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <layout class="QVBoxLayout" name="mplvl"/>
        </widget>
       </item>
      </layout>
@@ -157,10 +157,26 @@ border-bottom: 3px solid blue;
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225);}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225);  font: bold}
+</string>
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::AutoText</enum>
+           </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+           <property name="indent">
+            <number>-1</number>
            </property>
           </widget>
          </item>
@@ -190,7 +206,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -214,13 +230,19 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
          <item>
           <widget class="PushLabel" name="dynLabel3">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>102</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -250,7 +272,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -280,7 +302,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -310,7 +332,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -340,7 +362,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -370,7 +392,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -400,7 +422,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -430,7 +452,7 @@ QComboBox{ border-top: 0px solid rgb(85, 0, 255); background:rgb(225, 225, 225);
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue;}</string>
+            <string notr="true">QLabel{background:rgb(225, 225, 225); border-top: 3px solid blue; font: bold}</string>
            </property>
            <property name="text">
             <string/>
@@ -860,7 +882,7 @@ QPushButton:pressed {
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>10</width>
           <height>20</height>
          </size>
         </property>

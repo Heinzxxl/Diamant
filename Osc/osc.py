@@ -73,51 +73,101 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def cldisconnect1(self):
         if self.cl1:
             self.dynBox1.activated.disconnect()
+            self.dynBox1.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl1 = False
 
     def cldisconnect2(self):
         if self.cl2:
             self.dynBox2.activated.disconnect()
+            self.dynBox2.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl2 = False
 
     def cldisconnect3(self):
         if self.cl3:
             self.dynBox3.activated.disconnect()
+            self.dynBox3.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl3 = False
 
     def cldisconnect4(self):
         if self.cl4:
             self.dynBox4.activated.disconnect()
+            self.dynBox4.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl4 = False
 
     def cldisconnect5(self):
         if self.cl5:
             self.dynBox5.activated.disconnect()
+            self.dynBox5.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl5 = False
 
     def cldisconnect6(self):
         if self.cl6:
             self.dynBox6.activated.disconnect()
+            self.dynBox6.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl6 = False
 
     def cldisconnect7(self):
         if self.cl7:
             self.dynBox7.activated.disconnect()
+            self.dynBox7.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl7 = False
 
     def cldisconnect8(self):
         if self.cl8:
             self.dynBox8.activated.disconnect()
+            self.dynBox8.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl8 = False
 
     def cldisconnect9(self):
         if self.cl9:
             self.dynBox9.activated.disconnect()
+            self.dynBox9.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl9 = False
 
     def cldisconnect10(self):
         if self.cl10:
             self.dynBox10.activated.disconnect()
+            self.dynBox10.setStyleSheet(
+                    "QComboBox::drop-down {border-width: 0px}" +
+                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
+                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "background:rgb(225, 225, 225)}")
             self.cl10 = False
 
     # pushlabel disconnection
@@ -217,10 +267,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.dynLabel9.clear()
         self.dynLabel10.clear()
 
-    # pop-up control with pushLabels
-    # under construction XD
-    def ppctrl1(self):
-        pass
+    # dynBox proper connection (signal "activated")
+    def abconnect(self, box, slot):
+        box.activated.connect(slot)
+        box.setStyleSheet(
+                "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                "background:rgb(225, 225, 225);}")
 
     # function for Run/Stop
     def rschange(self):
@@ -235,50 +287,50 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def tgchange(self):
         self.alldyndisconnect()
         self.alldynclear()
-        self.dynBox1.activated.connect(self.tgslot1)
+        self.abconnect(self.dynBox1, self.tgslot1)
         self.cl1 = True
-        self.dynBox2.activated.connect(self.tgslot2)
+        self.abconnect(self.dynBox2, self.tgslot2)
         self.cl2 = True
-        self.dynBox3.activated.connect(self.tgslot3)
+        self.abconnect(self.dynBox3, self.tgslot3)
         self.cl3 = True
-        self.dynBox4.activated.connect(self.tgslot4)
+        self.abconnect(self.dynBox4, self.tgslot4)
         self.cl4 = True
-        self.dynBox8.activated.connect(self.tgslot8)
+        self.abconnect(self.dynBox8, self.tgslot8)
         self.cl8 = True
         self.dynLabel1.setText("Type")
         self.dynBox1.addItems(["Edge", "Video"])
-        self.dynBox1.setCurrentText(self._tgType)
+        self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._tgType))
         self.dynLabel2.setText("Mode")
         self.dynBox2.addItems(["Auto", "Normal", "Single"])
-        self.dynBox2.setCurrentText(self._tgMode)
+        self.dynBox2.setCurrentIndex(self.dynBox2.findText(self._tgMode))
         self.dynLabel3.setText("Record Length")
         self.dynBox3.addItems(["500 (20 us)", "1K (20 us)", "2K (20 us)",
                                "4K (40 us)", "8K (80 us)", "16K (160 us)",
                                "32K (320 us)", "64K (640 us)"])
-        self.dynBox3.setCurrentText(self._tgRLength)
+        self.dynBox3.setCurrentIndex(self.dynBox3.findText(self._tgRLength))
         self.dynLabel4.setText("Source")
         self.dynBox4.addItems(["CH1", "CH2", "CH3", "CH4", "CH5",
                                "CH6", "CH7", "CH8", "CH9", "CH10", "Ext"])
-        self.dynBox4.setCurrentText(self._tgSource)
+        self.dynBox4.setCurrentIndex(self.dynBox4.findText(self._tgSource))
         self.tgchange6()
         self.dynLabel8.setText("Delay Trigger")
         self.dynBox8.addItems(["On", "Off", "Setting..."])
-        self.dynBox8.setCurrentText(self._tgDelay)
+        self.dynBox8.setCurrentIndex(self.dynBox8.findText(self._tgDelay))
 
     # changing box6
     def tgchange6(self):
         if self._tgType == "Edge":
             self.dynLabel6.setText("Slope")
             self.dynBox6.addItems(["Rising", "Falling"])
-            self.dynBox6.setCurrentText(self._tgSlope)
-            self.dynBox6.activated.connect(self.tgslot6a)
+            self.dynBox6.setCurrentIndex(self.dynBox6.findText(self._tgSlope))
+            self.abconnect(self.dynBox6, self.tgslot6a)
             self.cl6 = True
         if self._tgType == "Video":
             self.dynLabel6.setText("Video Trig On")
             self.dynBox6.addItems(["Scan Line", "Field",
                                    "Odd Field", "Even Field"])
-            self.dynBox6.setCurrentText(self._tgVideo)
-            self.dynBox6.activated.connect(self.tgslot6b)
+            self.dynBox6.setCurrentIndex(self.dynBox6.findText(self._tgVideo))
+            self.abconnect(self.dynBox6, self.tgslot6b)
             self.cl6 = True
 
     # slots for Trigger
@@ -331,11 +383,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.lcl10 = True
         self.dynLabel10.setText(self._utlPage)
         if self._utlPage == "Next Page":
-            self.dynBox1.activated.connect(self.utslot1a)
+            self.abconnect(self.dynBox1, self.utslot1a)
             self.cl1 = True
             self.dynLabel1.setText("Languages")
             self.dynBox1.addItems(["English", "Russian"])
-            self.dynBox1.setCurrentText(self._utLang)
+            self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._utLang))
         if self._utlPage == "Prior Page":
             self.dynLabel1.setText("Product Information")
             self.dynLabel1.clicked.connect(self.utlslot1b)
