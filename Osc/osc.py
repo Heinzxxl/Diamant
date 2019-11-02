@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, QtCore, QtGui, uic
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import (
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
@@ -24,6 +24,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.cl9 = False
         self.cl10 = False
 
+        self.bcl1 = False
+        self.bcl2 = False
+        self.bcl3 = False
+        self.bcl4 = False
+        self.bcl5 = False
+        self.bcl6 = False
+        self.bcl7 = False
+        self.bcl8 = False
+        self.bcl9 = False
+        self.bcl10 = False
+
         self.lcl1 = False
         self.lcl2 = False
         self.lcl3 = False
@@ -47,7 +58,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._tgDelay = "Off"
         # Utility conditions
         self._utLang = "English"
-        self._utlPage = "Next Page"
+        self._utPage = "Next Page"
 
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
@@ -69,7 +80,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
 
-    # box disconnection
+    # experiments
+ #   def eventFilter(self, obj, event):
+ #       if obj == self.dynBox10.lineEdit():
+ #           if event.type() == QtCore.QEvent.MouseButtonPress:
+  #              self.dynLabel5.setText("Wow")
+  #      return True
+
+    # box disconnection ("clicked disonnect")
     def cldisconnect1(self):
         if self.cl1:
             self.dynBox1.activated.disconnect()
@@ -79,6 +97,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl1 = False
+        if self.bcl1:
+            self.dynBox1.clicked.disconnect()
+            self.dynBox1.setEnabled(True)
+            self.bcl1 = False
 
     def cldisconnect2(self):
         if self.cl2:
@@ -89,6 +111,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl2 = False
+        if self.bcl2:
+            self.dynBox2.clicked.disconnect()
+            self.dynBox2.setEnabled(True)
+            self.bcl2 = False
 
     def cldisconnect3(self):
         if self.cl3:
@@ -99,6 +125,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl3 = False
+        if self.bcl3:
+            self.dynBox3.clicked.disconnect()
+            self.dynBox3.setEnabled(True)
+            self.bcl3 = False
 
     def cldisconnect4(self):
         if self.cl4:
@@ -109,6 +139,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl4 = False
+        if self.bcl4:
+            self.dynBox4.clicked.disconnect()
+            self.dynBox4.setEnabled(True)
+            self.bcl4 = False
 
     def cldisconnect5(self):
         if self.cl5:
@@ -119,6 +153,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl5 = False
+        if self.bcl5:
+            self.dynBox5.clicked.disconnect()
+            self.dynBox5.setEnabled(True)
+            self.bcl5 = False
 
     def cldisconnect6(self):
         if self.cl6:
@@ -129,6 +167,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl6 = False
+        if self.bcl6:
+            self.dynBox6.clicked.disconnect()
+            self.dynBox6.setEnabled(True)
+            self.bcl6 = False
 
     def cldisconnect7(self):
         if self.cl7:
@@ -139,6 +181,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl7 = False
+        if self.bcl7:
+            self.dynBox7.clicked.disconnect()
+            self.dynBox7.setEnabled(True)
+            self.bcl7 = False
 
     def cldisconnect8(self):
         if self.cl8:
@@ -149,6 +195,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl8 = False
+        if self.bcl8:
+            self.dynBox8.clicked.disconnect()
+            self.dynBox8.setEnabled(True)
+            self.bcl8 = False
 
     def cldisconnect9(self):
         if self.cl9:
@@ -159,6 +209,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl9 = False
+        if self.bcl9:
+            self.dynBox9.clicked.disconnect()
+            self.dynBox9.setEnabled(True)
+            self.bcl9 = False
 
     def cldisconnect10(self):
         if self.cl10:
@@ -169,8 +223,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             self.cl10 = False
+        if self.bcl10:
+            self.dynBox10.clicked.disconnect()
+            self.dynBox10.setEnabled(True)
+            self.bcl10 = False
 
-    # pushlabel disconnection
+    # pushlabel disconnection ("label clicked disconnect")
     def lcldisconnect1(self):
         if self.lcl1:
             self.dynLabel1.clicked.disconnect()
@@ -273,6 +331,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         box.setStyleSheet(
                 "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                 "background:rgb(225, 225, 225);}")
+
+    # dynBox proper connection (signal "clicked")
+    def cbconnect(self, box, slot):
+        box.clicked.connect(slot)
+   #     box.setEnabled(False)
 
     # function for Run/Stop
     def rschange(self):
@@ -379,26 +442,42 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def utchange(self):
         self.alldyndisconnect()
         self.alldynclear()
-        self.dynLabel10.clicked.connect(self.utlslot10)
+        self.dynLabel10.clicked.connect(self.utslot10)
         self.lcl10 = True
-        self.dynLabel10.setText(self._utlPage)
-        if self._utlPage == "Next Page":
+        self.dynLabel10.setText("Page Select")
+        self.dynBox10.addItems(["Next Page", "Prior Page"])
+        self.dynBox10.setCurrentIndex(self.dynBox10.findText(self._utPage))
+        self.cbconnect(self.dynBox10, self.utslot10)
+        self.bcl10 = True
+      #
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      self.dynBox10.lineEdit().installEventFilter(self)
+        if self._utPage == "Next Page":
             self.abconnect(self.dynBox1, self.utslot1a)
             self.cl1 = True
             self.dynLabel1.setText("Languages")
             self.dynBox1.addItems(["English", "Russian"])
             self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._utLang))
-        if self._utlPage == "Prior Page":
+        if self._utPage == "Prior Page":
             self.dynLabel1.setText("Product Information")
             self.dynLabel1.clicked.connect(self.utlslot1b)
             self.lcl10 = True
 
     # slots for Utility
-    def utlslot10(self):
-        if self._utlPage == "Next Page":
-            self._utlPage = "Prior Page"
+    def utslot10(self):
+        if self._utPage == "Next Page":
+            self._utPage = "Prior Page"
         else:
-            self._utlPage = "Next Page"
+            self._utPage = "Next Page"
         self.utchange()
 
     def utslot1a(self):
