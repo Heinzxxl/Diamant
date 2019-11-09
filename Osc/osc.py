@@ -14,7 +14,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         self.settings = QtCore.QSettings("MySoft", "Osc")
-        self.settings.beginGroup("trigger")
+        self.load_settings()
+        self.initconnect()
 
         self.cl1 = False
         self.cl2 = False
@@ -49,25 +50,73 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.lcl9 = False
         self.lcl10 = False
 
+        if self._GlMode == "Trigger":
+            self.tgchange()
+        if self._GlMode == "Display":
+            self.dpchange()
+        if self._GlMode == "Cursor":
+            self.crchange()
+        if self._GlMode == "Measure":
+            self.mrchange()
+        if self._GlMode == "Utility":
+            self.utchange()
+        if self._GlMode == "SR":
+            self.srchange()
+        if self._GlMode == "Acquire":
+            self.aqchange()
+
+    # saving settings
+    def save_settings(self):
+        self.settings.setValue("CurrentMode", self._GlMode)
+
+        self.settings.beginGroup("Trigger")
+        self.settings.setValue("Type", self._tgType)
+        self.settings.setValue("Mode", self._tgMode)
+        self.settings.setValue("RLength", self._tgRLength)
+        self.settings.setValue("Source", self._tgSource)
+        self.settings.setValue("Slope", self._tgSlope)
+        self.settings.setValue("Video", self._tgVideo)
+        self.settings.endGroup()
+
+        self.settings.beginGroup("Utility")
+        self.settings.setValue("Language", self._utLang)
+        self.settings.setValue("Page", self._utPage)
+        self.settings.endGroup()
+
+    # loading settings
+    def load_settings(self):
         # Run/Stop condition
         self._Run = True
         # Trigger conditions
+        self.settings.beginGroup("Trigger")
         self._tgType = self.settings.value("Type", "Edge")
-        self._tgMode = "Auto"
-        self._tgRLength = "2K (20 us)"
-        self._tgSource = "CH1"
-        self._tgSlope = "Rising"
-        self._tgVideo = "Scan Line"
+        self._tgMode = self.settings.value("Mode", "Auto")
+        self._tgRLength = self.settings.value("RLength", "2K (20 us)")
+        self._tgSource = self.settings.value("Source", "CH1")
+        self._tgSlope = self.settings.value("Slope", "Rising")
+        self._tgVideo = self.settings.value("Video", "Scan Line")
         self._tgDelay = "Off"
+        self.settings.endGroup()
         # Utility conditions
-        self._utLang = "English"
+        self.settings.beginGroup("Utility")
+        self._utLang = self.settings.value("Language", "English")
         self._utCalib = "Off"
         self._utLog = "Off"
         self._utTCP = "Off"
         self._utPsFl = "Off"
         self._utVMon = "Off"
-        self._utPage = "Next Page"
+        self._utPage = self.settings.value("Page", "Next Page")
+        self.settings.endGroup()
 
+        self._GlMode = self.settings.value("CurrentMode", "Trigger")
+
+    # closing'n'saving
+    def closeEvent(self, event):
+        self.save_settings()
+        sys.exit()
+
+    # initial connections
+    def initconnect(self):
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
         self.DPButton.clicked.connect(self.dpchange)
@@ -76,20 +125,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.UTButton.clicked.connect(self.utchange)
         self.SRButton.clicked.connect(self.srchange)
         self.AQButton.clicked.connect(self.aqchange)
-
-        self.tgchange()
-        self.settings.endGroup()
-
-    # saving settings
-    def save_settings(self):
-        self.settings.beginGroup("trigger")
-        self.settings.setValue("Type", self._tgType)
-        self.settings.endGroup()
-
-    # closing
-    def closeEvent(self, event):
-        self.save_settings()
-        sys.exit()
 
     # adding figure to mplwidget
     def addfig(self, fig):
@@ -350,6 +385,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for Trigger
     def tgchange(self):
+        self._GlMode = "Trigger"
         self.alldyndisconnect()
         self.alldynclear()
         self.abconnect(self.dynBox1, self.tgslot1)
@@ -427,21 +463,25 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for Display
     def dpchange(self):
+        self._GlMode = "Display"
         self.alldyndisconnect()
         self.alldynclear()
 
     # function for Cursor
     def crchange(self):
+        self._GlMode = "Cursor"
         self.alldyndisconnect()
         self.alldynclear()
 
     # function for Measure
     def mrchange(self):
+        self._GlMode = "Measure"
         self.alldyndisconnect()
         self.alldynclear()
 
     # function for Utility
     def utchange(self):
+        self._GlMode = "Utility"
         self.alldyndisconnect()
         self.alldynclear()
         self.dynLabel10.clicked.connect(self.utslot10)
@@ -576,11 +616,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for Save/Recall
     def srchange(self):
+        self._GlMode = "SR"
         self.alldyndisconnect()
         self.alldynclear()
 
     # function for Acquire
     def aqchange(self):
+        self._GlMode = "Acquire"
         self.alldyndisconnect()
         self.alldynclear()
 
