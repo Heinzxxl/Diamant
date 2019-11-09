@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui, uic
+from PyQt5 import QtWidgets, QtCore, uic
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import (
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
@@ -12,6 +12,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        self.settings = QtCore.QSettings("MySoft", "Osc")
+        self.settings.beginGroup("trigger")
 
         self.cl1 = False
         self.cl2 = False
@@ -49,7 +52,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # Run/Stop condition
         self._Run = True
         # Trigger conditions
-        self._tgType = "Edge"
+        self._tgType = self.settings.value("Type", "Edge")
         self._tgMode = "Auto"
         self._tgRLength = "2K (20 us)"
         self._tgSource = "CH1"
@@ -58,6 +61,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._tgDelay = "Off"
         # Utility conditions
         self._utLang = "English"
+        self._utCalib = "Off"
+        self._utLog = "Off"
+        self._utTCP = "Off"
+        self._utPsFl = "Off"
+        self._utVMon = "Off"
         self._utPage = "Next Page"
 
         self.RSButton.clicked.connect(self.rschange)
@@ -70,6 +78,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.AQButton.clicked.connect(self.aqchange)
 
         self.tgchange()
+        self.settings.endGroup()
+
+    # saving settings
+    def save_settings(self):
+        self.settings.beginGroup("trigger")
+        self.settings.setValue("Type", self._tgType)
+        self.settings.endGroup()
+
+    # closing
+    def closeEvent(self, event):
+        self.save_settings()
+        sys.exit()
 
     # adding figure to mplwidget
     def addfig(self, fig):
@@ -79,13 +99,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
-
-    # experiments
- #   def eventFilter(self, obj, event):
- #       if obj == self.dynBox10.lineEdit():
- #           if event.type() == QtCore.QEvent.MouseButtonPress:
-  #              self.dynLabel5.setText("Wow")
-  #      return True
 
     # box disconnection ("clicked disonnect")
     def cldisconnect1(self):
@@ -99,7 +112,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl1 = False
         if self.bcl1:
             self.dynBox1.clicked.disconnect()
-            self.dynBox1.setEnabled(True)
             self.bcl1 = False
 
     def cldisconnect2(self):
@@ -113,7 +125,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl2 = False
         if self.bcl2:
             self.dynBox2.clicked.disconnect()
-            self.dynBox2.setEnabled(True)
             self.bcl2 = False
 
     def cldisconnect3(self):
@@ -127,7 +138,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl3 = False
         if self.bcl3:
             self.dynBox3.clicked.disconnect()
-            self.dynBox3.setEnabled(True)
             self.bcl3 = False
 
     def cldisconnect4(self):
@@ -141,7 +151,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl4 = False
         if self.bcl4:
             self.dynBox4.clicked.disconnect()
-            self.dynBox4.setEnabled(True)
             self.bcl4 = False
 
     def cldisconnect5(self):
@@ -155,7 +164,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl5 = False
         if self.bcl5:
             self.dynBox5.clicked.disconnect()
-            self.dynBox5.setEnabled(True)
             self.bcl5 = False
 
     def cldisconnect6(self):
@@ -169,7 +177,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl6 = False
         if self.bcl6:
             self.dynBox6.clicked.disconnect()
-            self.dynBox6.setEnabled(True)
             self.bcl6 = False
 
     def cldisconnect7(self):
@@ -183,7 +190,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl7 = False
         if self.bcl7:
             self.dynBox7.clicked.disconnect()
-            self.dynBox7.setEnabled(True)
             self.bcl7 = False
 
     def cldisconnect8(self):
@@ -197,7 +203,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl8 = False
         if self.bcl8:
             self.dynBox8.clicked.disconnect()
-            self.dynBox8.setEnabled(True)
             self.bcl8 = False
 
     def cldisconnect9(self):
@@ -211,7 +216,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl9 = False
         if self.bcl9:
             self.dynBox9.clicked.disconnect()
-            self.dynBox9.setEnabled(True)
             self.bcl9 = False
 
     def cldisconnect10(self):
@@ -225,7 +229,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cl10 = False
         if self.bcl10:
             self.dynBox10.clicked.disconnect()
-            self.dynBox10.setEnabled(True)
             self.bcl10 = False
 
     # pushlabel disconnection ("label clicked disconnect")
@@ -335,7 +338,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # dynBox proper connection (signal "clicked")
     def cbconnect(self, box, slot):
         box.clicked.connect(slot)
-   #     box.setEnabled(False)
 
     # function for Run/Stop
     def rschange(self):
@@ -377,7 +379,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.dynBox4.setCurrentIndex(self.dynBox4.findText(self._tgSource))
         self.tgchange6()
         self.dynLabel8.setText("Delay Trigger")
-        self.dynBox8.addItems(["On", "Off", "Setting..."])
+        self.dynBox8.addItems(["Off", "On", "Setting..."])
         self.dynBox8.setCurrentIndex(self.dynBox8.findText(self._tgDelay))
 
     # changing box6
@@ -444,33 +446,83 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.alldynclear()
         self.dynLabel10.clicked.connect(self.utslot10)
         self.lcl10 = True
-        self.dynLabel10.setText("Page Select")
-        self.dynBox10.addItems(["Next Page", "Prior Page"])
-        self.dynBox10.setCurrentIndex(self.dynBox10.findText(self._utPage))
+        self.dynLabel10.setText(self._utPage)
         self.cbconnect(self.dynBox10, self.utslot10)
         self.bcl10 = True
-      #
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      self.dynBox10.lineEdit().installEventFilter(self)
         if self._utPage == "Next Page":
             self.abconnect(self.dynBox1, self.utslot1a)
             self.cl1 = True
             self.dynLabel1.setText("Languages")
             self.dynBox1.addItems(["English", "Russian"])
             self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._utLang))
+            self.dynLabel2.setText("Factory Reset")
+            self.dynLabel2.clicked.connect(self.utslot2a)
+            self.lcl2 = True
+            self.cbconnect(self.dynBox2, self.utslot2a)
+            self.bcl2 = True
+            self.abconnect(self.dynBox3, self.utslot3a)
+            self.cl3 = True
+            self.dynLabel3.setText("Calibration")
+            self.dynBox3.addItems(["Off", "On"])
+            self.dynBox3.setCurrentIndex(self.dynBox3.findText(self._utCalib))
+            self.abconnect(self.dynBox4, self.utslot4a)
+            self.cl4 = True
+            self.dynLabel4.setText("Logger")
+            self.dynBox4.addItems(["Off", "On"])
+            self.dynBox4.setCurrentIndex(self.dynBox4.findText(self._utLog))
+            self.abconnect(self.dynBox5, self.utslot5a)
+            self.cl5 = True
+            self.dynLabel5.setText("Export Data")
+            self.dynBox5.addItems(["", "Text", "HTML", "Current Setup",
+                                   "All Setups", "DSO"])
+            self.dynBox5.setCurrentIndex(0)
+            self.abconnect(self.dynBox6, self.utslot6a)
+            self.cl6 = True
+            self.dynLabel6.setText("Import Data")
+            self.dynBox6.addItems(["", "Logger", "Current Setup",
+                                   "All Setups", "DSO"])
+            self.dynBox6.setCurrentIndex(0)
+            self.abconnect(self.dynBox7, self.utslot7a)
+            self.cl7 = True
+            self.dynLabel7.setText("TCP/IP")
+            self.dynBox7.addItems(["Off", "On"])
+            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._utTCP))
+            self.dynLabel9.setText("Launch")
+            self.dynLabel9.clicked.connect(self.utslot9a)
+            self.lcl9 = True
+            self.cbconnect(self.dynBox9, self.utslot9a)
+            self.bcl9 = True
         if self._utPage == "Prior Page":
-            self.dynLabel1.setText("Product Information")
-            self.dynLabel1.clicked.connect(self.utlslot1b)
-            self.lcl10 = True
+            self.dynLabel1.setText("Product Info")
+            self.dynLabel1.clicked.connect(self.utslot1b)
+            self.lcl1 = True
+            self.cbconnect(self.dynBox1, self.utslot1b)
+            self.bcl1 = True
+            self.abconnect(self.dynBox2, self.utslot2b)
+            self.cl2 = True
+            self.dynLabel2.setText("Pass/Fail")
+            self.dynBox2.addItems(["Off", "On"])
+            self.dynBox2.setCurrentIndex(self.dynBox2.findText(self._utPsFl))
+            self.dynLabel3.setText("Hot Keys")
+            self.dynLabel3.clicked.connect(self.utslot3b)
+            self.lcl3 = True
+            self.cbconnect(self.dynBox3, self.utslot3b)
+            self.bcl3 = True
+            self.abconnect(self.dynBox7, self.utslot7b)
+            self.cl7 = True
+            self.dynLabel7.setText("VISA Monitor")
+            self.dynBox7.addItems(["Off", "On"])
+            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._utVMon))
+            self.dynLabel8.setText("Online Update")
+            self.dynLabel8.clicked.connect(self.utslot8b)
+            self.lcl8 = True
+            self.cbconnect(self.dynBox8, self.utslot8b)
+            self.bcl8 = True
+            self.dynLabel9.setText("Customize")
+            self.dynLabel9.clicked.connect(self.utslot9b)
+            self.lcl9 = True
+            self.cbconnect(self.dynBox9, self.utslot9b)
+            self.bcl9 = True
 
     # slots for Utility
     def utslot10(self):
@@ -483,7 +535,43 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def utslot1a(self):
         self._utLang = self.dynBox1.currentText()
 
-    def utlslot1b(self):
+    def utslot2a(self):
+        pass
+
+    def utslot3a(self):
+        self._utCalib = self.dynBox3.currentText()
+
+    def utslot4a(self):
+        self._utLog = self.dynBox4.currentText()
+
+    def utslot5a(self):
+        self.dynBox5.setCurrentIndex(0)
+
+    def utslot6a(self):
+        self.dynBox6.setCurrentIndex(0)
+
+    def utslot7a(self):
+        self._utTCP = self.dynBox7.currentText()
+
+    def utslot9a(self):
+        pass
+
+    def utslot1b(self):
+        pass
+
+    def utslot2b(self):
+        self._utPsFl = self.dynBox2.currentText()
+
+    def utslot3b(self):
+        pass
+
+    def utslot7b(self):
+        self._utVMon = self.dynBox7.currentText()
+
+    def utslot8b(self):
+        pass
+
+    def utslot9b(self):
         pass
 
     # function for Save/Recall
