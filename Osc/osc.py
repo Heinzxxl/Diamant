@@ -15,60 +15,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.settings = QtCore.QSettings("MySoft", "Osc")
         self.load_settings()
-        self.initconnect()
 
-        self.cl1 = False
-        self.cl2 = False
-        self.cl3 = False
-        self.cl4 = False
-        self.cl5 = False
-        self.cl6 = False
-        self.cl7 = False
-        self.cl8 = False
-        self.cl9 = False
-        self.cl10 = False
-
-        self.bcl1 = False
-        self.bcl2 = False
-        self.bcl3 = False
-        self.bcl4 = False
-        self.bcl5 = False
-        self.bcl6 = False
-        self.bcl7 = False
-        self.bcl8 = False
-        self.bcl9 = False
-        self.bcl10 = False
-
-        self.lcl1 = False
-        self.lcl2 = False
-        self.lcl3 = False
-        self.lcl4 = False
-        self.lcl5 = False
-        self.lcl6 = False
-        self.lcl7 = False
-        self.lcl8 = False
-        self.lcl9 = False
-        self.lcl10 = False
-
-        if self._GlMode == "Trigger":
-            self.tgchange()
-        if self._GlMode == "Display":
-            self.dpchange()
-        if self._GlMode == "Cursor":
-            self.crchange()
-        if self._GlMode == "Measure":
-            self.mrchange()
-        if self._GlMode == "Utility":
-            self.utchange()
-        if self._GlMode == "SR":
-            self.srchange()
-        if self._GlMode == "Acquire":
-            self.aqchange()
+        self.setflags()
+        self.initconnection()
+        self.setGlMode()
 
     # saving settings
     def save_settings(self):
+        # Global Mode condition
         self.settings.setValue("CurrentMode", self._GlMode)
-
+        # Trigger conditions
         self.settings.beginGroup("Trigger")
         self.settings.setValue("Type", self._tgType)
         self.settings.setValue("Mode", self._tgMode)
@@ -77,7 +33,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue("Slope", self._tgSlope)
         self.settings.setValue("Video", self._tgVideo)
         self.settings.endGroup()
-
+        # Utility conditions
         self.settings.beginGroup("Utility")
         self.settings.setValue("Language", self._utLang)
         self.settings.setValue("Page", self._utPage)
@@ -107,7 +63,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._utVMon = "Off"
         self._utPage = self.settings.value("Page", "Next Page")
         self.settings.endGroup()
-
+        # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
 
     # closing'n'saving
@@ -115,8 +71,44 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.save_settings()
         sys.exit()
 
+    # setting flags
+    def setflags(self):
+        # dynBox activated signal is connected
+        self.cl1 = False
+        self.cl2 = False
+        self.cl3 = False
+        self.cl4 = False
+        self.cl5 = False
+        self.cl6 = False
+        self.cl7 = False
+        self.cl8 = False
+        self.cl9 = False
+        self.cl10 = False
+        # dynBox clicked signal is connected
+        self.bcl1 = False
+        self.bcl2 = False
+        self.bcl3 = False
+        self.bcl4 = False
+        self.bcl5 = False
+        self.bcl6 = False
+        self.bcl7 = False
+        self.bcl8 = False
+        self.bcl9 = False
+        self.bcl10 = False
+        # pushLabel clicked signal is connected
+        self.lcl1 = False
+        self.lcl2 = False
+        self.lcl3 = False
+        self.lcl4 = False
+        self.lcl5 = False
+        self.lcl6 = False
+        self.lcl7 = False
+        self.lcl8 = False
+        self.lcl9 = False
+        self.lcl10 = False
+
     # initial connections
-    def initconnect(self):
+    def initconnection(self):
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
         self.DPButton.clicked.connect(self.dpchange)
@@ -125,6 +117,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.UTButton.clicked.connect(self.utchange)
         self.SRButton.clicked.connect(self.srchange)
         self.AQButton.clicked.connect(self.aqchange)
+
+    # initial global mode setting
+    def setGlMode(self):
+        if self._GlMode == "Trigger":
+            self.tgchange()
+        if self._GlMode == "Display":
+            self.dpchange()
+        if self._GlMode == "Cursor":
+            self.crchange()
+        if self._GlMode == "Measure":
+            self.mrchange()
+        if self._GlMode == "Utility":
+            self.utchange()
+        if self._GlMode == "SR":
+            self.srchange()
+        if self._GlMode == "Acquire":
+            self.aqchange()
 
     # adding figure to mplwidget
     def addfig(self, fig):
@@ -398,6 +407,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.cl4 = True
         self.abconnect(self.dynBox8, self.tgslot8)
         self.cl8 = True
+
         self.dynLabel1.setText("Type")
         self.dynBox1.addItems(["Edge", "Video"])
         self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._tgType))
@@ -489,6 +499,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.dynLabel10.setText(self._utPage)
         self.cbconnect(self.dynBox10, self.utslot10)
         self.bcl10 = True
+
         if self._utPage == "Next Page":
             self.abconnect(self.dynBox1, self.utslot1a)
             self.cl1 = True
@@ -532,6 +543,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.lcl9 = True
             self.cbconnect(self.dynBox9, self.utslot9a)
             self.bcl9 = True
+
         if self._utPage == "Prior Page":
             self.dynLabel1.setText("Product Info")
             self.dynLabel1.clicked.connect(self.utslot1b)
