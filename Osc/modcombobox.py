@@ -6,6 +6,8 @@ class ModComboBox(QtWidgets.QComboBox):
 
     def __init__(self, parent):
         super().__init__()
+        self.signalClickedIsConnected = False
+        self.signalActivatedIsConnected = False
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:

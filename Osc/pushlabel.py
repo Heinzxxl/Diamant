@@ -6,6 +6,7 @@ class PushLabel(QtWidgets.QLabel):
 
     def __init__(self, parent):
         super().__init__()
+        self.signalClickedIsConnected = False
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:

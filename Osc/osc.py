@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore, uic
-from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import (
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 import numpy as np
@@ -13,12 +13,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
+        # loading settings
         self.settings = QtCore.QSettings("MySoft", "Osc")
         self.load_settings()
 
-        self.setflags()
-        self.initconnection()
-        self.setGlMode()
+        # current setup
+        self.init_connection()
+        self.set_GlMode()
 
     # saving settings
     def save_settings(self):
@@ -71,44 +72,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.save_settings()
         sys.exit()
 
-    # setting flags
-    def setflags(self):
-        # dynBox activated signal is connected
-        self.cl1 = False
-        self.cl2 = False
-        self.cl3 = False
-        self.cl4 = False
-        self.cl5 = False
-        self.cl6 = False
-        self.cl7 = False
-        self.cl8 = False
-        self.cl9 = False
-        self.cl10 = False
-        # dynBox clicked signal is connected
-        self.bcl1 = False
-        self.bcl2 = False
-        self.bcl3 = False
-        self.bcl4 = False
-        self.bcl5 = False
-        self.bcl6 = False
-        self.bcl7 = False
-        self.bcl8 = False
-        self.bcl9 = False
-        self.bcl10 = False
-        # pushLabel clicked signal is connected
-        self.lcl1 = False
-        self.lcl2 = False
-        self.lcl3 = False
-        self.lcl4 = False
-        self.lcl5 = False
-        self.lcl6 = False
-        self.lcl7 = False
-        self.lcl8 = False
-        self.lcl9 = False
-        self.lcl10 = False
-
     # initial connections
-    def initconnection(self):
+    def init_connection(self):
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
         self.DPButton.clicked.connect(self.dpchange)
@@ -119,7 +84,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.AQButton.clicked.connect(self.aqchange)
 
     # initial global mode setting
-    def setGlMode(self):
+    def set_GlMode(self):
         if self._GlMode == "Trigger":
             self.tgchange()
         if self._GlMode == "Display":
@@ -144,213 +109,51 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
 
-    # box disconnection ("clicked disonnect")
-    def cldisconnect1(self):
-        if self.cl1:
-            self.dynBox1.activated.disconnect()
-            self.dynBox1.setStyleSheet(
+    # box disconnection
+    def disconnect_box(self, box):
+        if box.signalActivatedIsConnected:
+            box.activated.disconnect()
+            box.setStyleSheet(
                     "QComboBox::drop-down {border-width: 0px}" +
                     "QComboBox::down-arrow {image: none; border-width: 0px}" +
                     "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
-            self.cl1 = False
-        if self.bcl1:
-            self.dynBox1.clicked.disconnect()
-            self.bcl1 = False
+            box.signalActivatedIsConnected = False
+        if box.signalClickedIsConnected:
+            box.clicked.disconnect()
+            box.signalClickedIsConnected = False
 
-    def cldisconnect2(self):
-        if self.cl2:
-            self.dynBox2.activated.disconnect()
-            self.dynBox2.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl2 = False
-        if self.bcl2:
-            self.dynBox2.clicked.disconnect()
-            self.bcl2 = False
-
-    def cldisconnect3(self):
-        if self.cl3:
-            self.dynBox3.activated.disconnect()
-            self.dynBox3.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl3 = False
-        if self.bcl3:
-            self.dynBox3.clicked.disconnect()
-            self.bcl3 = False
-
-    def cldisconnect4(self):
-        if self.cl4:
-            self.dynBox4.activated.disconnect()
-            self.dynBox4.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl4 = False
-        if self.bcl4:
-            self.dynBox4.clicked.disconnect()
-            self.bcl4 = False
-
-    def cldisconnect5(self):
-        if self.cl5:
-            self.dynBox5.activated.disconnect()
-            self.dynBox5.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl5 = False
-        if self.bcl5:
-            self.dynBox5.clicked.disconnect()
-            self.bcl5 = False
-
-    def cldisconnect6(self):
-        if self.cl6:
-            self.dynBox6.activated.disconnect()
-            self.dynBox6.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl6 = False
-        if self.bcl6:
-            self.dynBox6.clicked.disconnect()
-            self.bcl6 = False
-
-    def cldisconnect7(self):
-        if self.cl7:
-            self.dynBox7.activated.disconnect()
-            self.dynBox7.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl7 = False
-        if self.bcl7:
-            self.dynBox7.clicked.disconnect()
-            self.bcl7 = False
-
-    def cldisconnect8(self):
-        if self.cl8:
-            self.dynBox8.activated.disconnect()
-            self.dynBox8.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl8 = False
-        if self.bcl8:
-            self.dynBox8.clicked.disconnect()
-            self.bcl8 = False
-
-    def cldisconnect9(self):
-        if self.cl9:
-            self.dynBox9.activated.disconnect()
-            self.dynBox9.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl9 = False
-        if self.bcl9:
-            self.dynBox9.clicked.disconnect()
-            self.bcl9 = False
-
-    def cldisconnect10(self):
-        if self.cl10:
-            self.dynBox10.activated.disconnect()
-            self.dynBox10.setStyleSheet(
-                    "QComboBox::drop-down {border-width: 0px}" +
-                    "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
-                    "background:rgb(225, 225, 225)}")
-            self.cl10 = False
-        if self.bcl10:
-            self.dynBox10.clicked.disconnect()
-            self.bcl10 = False
-
-    # pushlabel disconnection ("label clicked disconnect")
-    def lcldisconnect1(self):
-        if self.lcl1:
-            self.dynLabel1.clicked.disconnect()
-            self.lcl1 = False
-
-    def lcldisconnect2(self):
-        if self.lcl2:
-            self.dynLabel2.clicked.disconnect()
-            self.lcl2 = False
-
-    def lcldisconnect3(self):
-        if self.lcl3:
-            self.dynLabel3.clicked.disconnect()
-            self.lcl3 = False
-
-    def lcldisconnect4(self):
-        if self.lcl4:
-            self.dynLabel4.clicked.disconnect()
-            self.lcl4 = False
-
-    def lcldisconnect5(self):
-        if self.lcl5:
-            self.dynLabel5.clicked.disconnect()
-            self.lcl5 = False
-
-    def lcldisconnect6(self):
-        if self.lcl6:
-            self.dynLabel6.clicked.disconnect()
-            self.lcl6 = False
-
-    def lcldisconnect7(self):
-        if self.lcl7:
-            self.dynLabel7.clicked.disconnect()
-            self.lcl7 = False
-
-    def lcldisconnect8(self):
-        if self.lcl8:
-            self.dynLabel8.clicked.disconnect()
-            self.lcl8 = False
-
-    def lcldisconnect9(self):
-        if self.lcl9:
-            self.dynLabel9.clicked.disconnect()
-            self.lcl9 = False
-
-    def lcldisconnect10(self):
-        if self.lcl10:
-            self.dynLabel10.clicked.disconnect()
-            self.lcl10 = False
+    # pushlabel disconnection
+    def disconnect_label(self, label):
+        if label.signalClickedIsConnected:
+            label.clicked.disconnect()
+            label.signalClickedIsConnected = False
 
     # dynamic buttons disconnection
     def alldyndisconnect(self):
-        self.cldisconnect1()
-        self.cldisconnect2()
-        self.cldisconnect3()
-        self.cldisconnect4()
-        self.cldisconnect5()
-        self.cldisconnect6()
-        self.cldisconnect7()
-        self.cldisconnect8()
-        self.cldisconnect9()
-        self.cldisconnect10()
-        self.lcldisconnect1()
-        self.lcldisconnect2()
-        self.lcldisconnect3()
-        self.lcldisconnect4()
-        self.lcldisconnect5()
-        self.lcldisconnect6()
-        self.lcldisconnect7()
-        self.lcldisconnect8()
-        self.lcldisconnect9()
-        self.lcldisconnect10()
+        self.disconnect_box(self.dynBox1)
+        self.disconnect_box(self.dynBox2)
+        self.disconnect_box(self.dynBox3)
+        self.disconnect_box(self.dynBox4)
+        self.disconnect_box(self.dynBox5)
+        self.disconnect_box(self.dynBox6)
+        self.disconnect_box(self.dynBox7)
+        self.disconnect_box(self.dynBox8)
+        self.disconnect_box(self.dynBox9)
+        self.disconnect_box(self.dynBox10)
+        self.disconnect_label(self.dynLabel1)
+        self.disconnect_label(self.dynLabel2)
+        self.disconnect_label(self.dynLabel3)
+        self.disconnect_label(self.dynLabel4)
+        self.disconnect_label(self.dynLabel5)
+        self.disconnect_label(self.dynLabel6)
+        self.disconnect_label(self.dynLabel7)
+        self.disconnect_label(self.dynLabel8)
+        self.disconnect_label(self.dynLabel9)
+        self.disconnect_label(self.dynLabel10)
 
     # clear names of dynamic boxes
-    def alldynclear(self):
+    def clear_all_fields(self):
         self.dynBox1.clear()
         self.dynBox2.clear()
         self.dynBox3.clear()
@@ -375,6 +178,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # dynBox proper connection (signal "activated")
     def abconnect(self, box, slot):
         box.activated.connect(slot)
+        box.signalActivatedIsConnected = True
         box.setStyleSheet(
                 "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
                 "background:rgb(225, 225, 225);}")
@@ -382,6 +186,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # dynBox proper connection (signal "clicked")
     def cbconnect(self, box, slot):
         box.clicked.connect(slot)
+        box.signalClickedIsConnected = True
+
+    # dynLabel proper connection (signal "clicked")
+    def lclconnect(self, label, slot):
+        label.clicked.connect(slot)
+        label.signalClickedIsConnected = True
 
     # function for Run/Stop
     def rschange(self):
@@ -396,34 +206,35 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def tgchange(self):
         self._GlMode = "Trigger"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
+
         self.abconnect(self.dynBox1, self.tgslot1)
-        self.cl1 = True
         self.abconnect(self.dynBox2, self.tgslot2)
-        self.cl2 = True
         self.abconnect(self.dynBox3, self.tgslot3)
-        self.cl3 = True
         self.abconnect(self.dynBox4, self.tgslot4)
-        self.cl4 = True
         self.abconnect(self.dynBox8, self.tgslot8)
-        self.cl8 = True
 
         self.dynLabel1.setText("Type")
         self.dynBox1.addItems(["Edge", "Video"])
         self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._tgType))
+
         self.dynLabel2.setText("Mode")
         self.dynBox2.addItems(["Auto", "Normal", "Single"])
         self.dynBox2.setCurrentIndex(self.dynBox2.findText(self._tgMode))
+
         self.dynLabel3.setText("Record Length")
         self.dynBox3.addItems(["500 (20 us)", "1K (20 us)", "2K (20 us)",
                                "4K (40 us)", "8K (80 us)", "16K (160 us)",
                                "32K (320 us)", "64K (640 us)"])
         self.dynBox3.setCurrentIndex(self.dynBox3.findText(self._tgRLength))
+
         self.dynLabel4.setText("Source")
         self.dynBox4.addItems(["CH1", "CH2", "CH3", "CH4", "CH5",
                                "CH6", "CH7", "CH8", "CH9", "CH10", "Ext"])
         self.dynBox4.setCurrentIndex(self.dynBox4.findText(self._tgSource))
+
         self.tgchange6()
+
         self.dynLabel8.setText("Delay Trigger")
         self.dynBox8.addItems(["Off", "On", "Setting..."])
         self.dynBox8.setCurrentIndex(self.dynBox8.findText(self._tgDelay))
@@ -435,20 +246,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.dynBox6.addItems(["Rising", "Falling"])
             self.dynBox6.setCurrentIndex(self.dynBox6.findText(self._tgSlope))
             self.abconnect(self.dynBox6, self.tgslot6a)
-            self.cl6 = True
         if self._tgType == "Video":
             self.dynLabel6.setText("Video Trig On")
             self.dynBox6.addItems(["Scan Line", "Field",
                                    "Odd Field", "Even Field"])
             self.dynBox6.setCurrentIndex(self.dynBox6.findText(self._tgVideo))
             self.abconnect(self.dynBox6, self.tgslot6b)
-            self.cl6 = True
 
     # slots for Trigger
     def tgslot1(self):
         self._tgType = self.dynBox1.currentText()
-        self.cldisconnect6()
-        self.lcldisconnect6()
+        self.disconnect_box(self.dynBox6)
         self.dynBox6.clear()
         self.dynLabel6.clear()
         self.tgchange6()
@@ -475,106 +283,97 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def dpchange(self):
         self._GlMode = "Display"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
 
     # function for Cursor
     def crchange(self):
         self._GlMode = "Cursor"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
 
     # function for Measure
     def mrchange(self):
         self._GlMode = "Measure"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
 
     # function for Utility
     def utchange(self):
         self._GlMode = "Utility"
         self.alldyndisconnect()
-        self.alldynclear()
-        self.dynLabel10.clicked.connect(self.utslot10)
-        self.lcl10 = True
+        self.clear_all_fields()
+
+        self.lclconnect(self.dynLabel10, self.utslot10)
         self.dynLabel10.setText(self._utPage)
         self.cbconnect(self.dynBox10, self.utslot10)
-        self.bcl10 = True
 
         if self._utPage == "Next Page":
             self.abconnect(self.dynBox1, self.utslot1a)
-            self.cl1 = True
             self.dynLabel1.setText("Languages")
             self.dynBox1.addItems(["English", "Russian"])
             self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._utLang))
+
             self.dynLabel2.setText("Factory Reset")
-            self.dynLabel2.clicked.connect(self.utslot2a)
-            self.lcl2 = True
+            self.lclconnect(self.dynLabel2, self.utslot2a)
             self.cbconnect(self.dynBox2, self.utslot2a)
-            self.bcl2 = True
+
             self.abconnect(self.dynBox3, self.utslot3a)
-            self.cl3 = True
             self.dynLabel3.setText("Calibration")
             self.dynBox3.addItems(["Off", "On"])
             self.dynBox3.setCurrentIndex(self.dynBox3.findText(self._utCalib))
+
             self.abconnect(self.dynBox4, self.utslot4a)
-            self.cl4 = True
             self.dynLabel4.setText("Logger")
             self.dynBox4.addItems(["Off", "On"])
             self.dynBox4.setCurrentIndex(self.dynBox4.findText(self._utLog))
+
             self.abconnect(self.dynBox5, self.utslot5a)
-            self.cl5 = True
             self.dynLabel5.setText("Export Data")
             self.dynBox5.addItems(["", "Text", "HTML", "Current Setup",
                                    "All Setups", "DSO"])
             self.dynBox5.setCurrentIndex(0)
+
             self.abconnect(self.dynBox6, self.utslot6a)
-            self.cl6 = True
             self.dynLabel6.setText("Import Data")
             self.dynBox6.addItems(["", "Logger", "Current Setup",
                                    "All Setups", "DSO"])
             self.dynBox6.setCurrentIndex(0)
+
             self.abconnect(self.dynBox7, self.utslot7a)
-            self.cl7 = True
             self.dynLabel7.setText("TCP/IP")
             self.dynBox7.addItems(["Off", "On"])
             self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._utTCP))
+
             self.dynLabel9.setText("Launch")
-            self.dynLabel9.clicked.connect(self.utslot9a)
-            self.lcl9 = True
+            self.lclconnect(self.dynLabel9, self.utslot9a)
             self.cbconnect(self.dynBox9, self.utslot9a)
-            self.bcl9 = True
 
         if self._utPage == "Prior Page":
             self.dynLabel1.setText("Product Info")
-            self.dynLabel1.clicked.connect(self.utslot1b)
-            self.lcl1 = True
+            self.lclconnect(self.dynLabel1, self.utslot1b)
             self.cbconnect(self.dynBox1, self.utslot1b)
-            self.bcl1 = True
+
             self.abconnect(self.dynBox2, self.utslot2b)
-            self.cl2 = True
             self.dynLabel2.setText("Pass/Fail")
             self.dynBox2.addItems(["Off", "On"])
             self.dynBox2.setCurrentIndex(self.dynBox2.findText(self._utPsFl))
+
             self.dynLabel3.setText("Hot Keys")
-            self.dynLabel3.clicked.connect(self.utslot3b)
-            self.lcl3 = True
+            self.lclconnect(self.dynLabel3, self.utslot3b)
             self.cbconnect(self.dynBox3, self.utslot3b)
-            self.bcl3 = True
+
             self.abconnect(self.dynBox7, self.utslot7b)
-            self.cl7 = True
             self.dynLabel7.setText("VISA Monitor")
             self.dynBox7.addItems(["Off", "On"])
             self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._utVMon))
+
             self.dynLabel8.setText("Online Update")
-            self.dynLabel8.clicked.connect(self.utslot8b)
-            self.lcl8 = True
+            self.lclconnect(self.dynLabel8, self.utslot8b)
             self.cbconnect(self.dynBox8, self.utslot8b)
-            self.bcl8 = True
+
             self.dynLabel9.setText("Customize")
-            self.dynLabel9.clicked.connect(self.utslot9b)
-            self.lcl9 = True
+            self.lclconnect(self.dynLabel9, self.utslot9b)
             self.cbconnect(self.dynBox9, self.utslot9b)
-            self.bcl9 = True
 
     # slots for Utility
     def utslot10(self):
@@ -630,19 +429,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def srchange(self):
         self._GlMode = "SR"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
 
     # function for Acquire
     def aqchange(self):
         self._GlMode = "Acquire"
         self.alldyndisconnect()
-        self.alldynclear()
+        self.clear_all_fields()
 
 
-fig1 = Figure()
+fig1 = plt.figure()
 ax1f1 = fig1.add_subplot(111)
 ax1f1.plot(np.random.rand(5))
 fig1.set_tight_layout(True)
+plt.grid(True)
 
 app = QtWidgets.QApplication([])
 application = MyWindow()
