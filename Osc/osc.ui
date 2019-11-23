@@ -141,7 +141,7 @@ border-bottom: 3px solid blue;
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <layout class="QVBoxLayout" name="dynvl">
          <property name="spacing">
           <number>0</number>
          </property>

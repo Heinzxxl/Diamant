@@ -1,9 +1,8 @@
 from PyQt5 import QtWidgets, QtCore, uic
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import (
-        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-import numpy as np
+        NavigationToolbar2QT as NavigationToolbar)
 import sys
+from animatedmplcanvas import AnimatedMplCanvas
 
 Ui_MainWindow, QMainWindow = uic.loadUiType('osc.ui')
 
@@ -20,6 +19,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # current setup
         self.init_connection()
         self.set_GlMode()
+        self.add_canvas()
 
     # saving settings
     def save_settings(self):
@@ -42,8 +42,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # loading settings
     def load_settings(self):
-        # Run/Stop condition
-        self._Run = True
         # Trigger conditions
         self.settings.beginGroup("Trigger")
         self._tgType = self.settings.value("Type", "Edge")
@@ -100,11 +98,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self._GlMode == "Acquire":
             self.aqchange()
 
-    # adding figure to mplwidget
-    def addfig(self, fig):
-        self.canvas = FigureCanvas(fig)
+    # adding canvas to mplwidget
+    def add_canvas(self):
+        self.canvas = AnimatedMplCanvas()
         self.mplvl.addWidget(self.canvas)
-        self.canvas.draw()
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
@@ -154,26 +151,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # clear names of dynamic boxes
     def clear_all_fields(self):
-        self.dynBox1.clear()
-        self.dynBox2.clear()
-        self.dynBox3.clear()
-        self.dynBox4.clear()
-        self.dynBox5.clear()
-        self.dynBox6.clear()
-        self.dynBox7.clear()
-        self.dynBox8.clear()
-        self.dynBox9.clear()
-        self.dynBox10.clear()
-        self.dynLabel1.clear()
-        self.dynLabel2.clear()
-        self.dynLabel3.clear()
-        self.dynLabel4.clear()
-        self.dynLabel5.clear()
-        self.dynLabel6.clear()
-        self.dynLabel7.clear()
-        self.dynLabel8.clear()
-        self.dynLabel9.clear()
-        self.dynLabel10.clear()
+        widgets = (self.dynvl.itemAt(i).widget()
+                   for i in range(self.dynvl.count()))
+        for widget in widgets:
+            widget.clear()
 
     # dynBox proper connection (signal "activated")
     def abconnect(self, box, slot):
@@ -195,12 +176,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for Run/Stop
     def rschange(self):
-        if self._Run:
+        if self.canvas.animation_is_running:
             self.rsLabel.setText('Stop')
-            self._Run = False
+            self.canvas.anim.event_source.stop()
+            self.canvas.animation_is_running = False
         else:
             self.rsLabel.setText('Run')
-            self._Run = True
+            self.canvas.anim.event_source.start()
+            self.canvas.animation_is_running = True
 
     # function for Trigger
     def tgchange(self):
@@ -438,15 +421,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.clear_all_fields()
 
 
-fig1 = plt.figure()
-ax1f1 = fig1.add_subplot(111)
-ax1f1.plot(np.random.rand(5))
-fig1.set_tight_layout(True)
-plt.grid(True)
-
 app = QtWidgets.QApplication([])
 application = MyWindow()
-application.addfig(fig1)
 application.show()
 
 sys.exit(app.exec())
