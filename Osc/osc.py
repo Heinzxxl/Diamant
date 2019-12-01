@@ -17,9 +17,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.load_settings()
 
         # current setup
-        self.init_connection()
+        self.init_button_connection()
         self.set_GlMode()
         self.add_canvas()
+        self.checkbox_connection()
+        self.CH1_ctrl()
 
     # saving settings
     def save_settings(self):
@@ -42,6 +44,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # loading settings
     def load_settings(self):
+        self.CH1Box.setChecked(True)
         # Trigger conditions
         self.settings.beginGroup("Trigger")
         self._tgType = self.settings.value("Type", "Edge")
@@ -71,7 +74,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         sys.exit()
 
     # initial connections
-    def init_connection(self):
+    def init_button_connection(self):
         self.RSButton.clicked.connect(self.rschange)
         self.TGButton.clicked.connect(self.tgchange)
         self.DPButton.clicked.connect(self.dpchange)
@@ -80,6 +83,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.UTButton.clicked.connect(self.utchange)
         self.SRButton.clicked.connect(self.srchange)
         self.AQButton.clicked.connect(self.aqchange)
+
+        self.plusVButton.clicked.connect(self.zoom_in_volts)
+        self.minusVButton.clicked.connect(self.zoom_out_volts)
+        self.plusSecButton.clicked.connect(self.zoom_in_seconds)
+        self.minusSecButton.clicked.connect(self.zoom_out_seconds)
 
     # initial global mode setting
     def set_GlMode(self):
@@ -105,6 +113,44 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
+
+    # checkboxes connection
+    def checkbox_connection(self):
+        self.CH1Box.stateChanged.connect(self.CH1_ctrl)
+        self.CH2Box.stateChanged.connect(self.CH2_ctrl)
+
+    def CH1_ctrl(self):
+        if self.CH1Box.isChecked():
+            self.canvas.enable_channel("CH1")
+        else:
+            self.canvas.disable_channel("CH1")
+
+    def CH2_ctrl(self):
+        if self.CH2Box.isChecked():
+            self.canvas.enable_channel("CH2")
+        else:
+            self.canvas.disable_channel("CH2")
+
+    # zooming in/out
+    def zoom_in_volts(self):
+        if self.canvas.currentVoltsScaleNumber > 0:
+            self.canvas.currentVoltsScaleNumber -= 1
+            self.canvas.rescale_axes()
+
+    def zoom_out_volts(self):
+        if self.canvas.currentVoltsScaleNumber < 11:
+            self.canvas.currentVoltsScaleNumber += 1
+            self.canvas.rescale_axes()
+
+    def zoom_in_seconds(self):
+        if self.canvas.currentSecondsScaleNumber > 0:
+            self.canvas.currentSecondsScaleNumber -= 1
+            self.canvas.rescale_axes()
+
+    def zoom_out_seconds(self):
+        if self.canvas.currentSecondsScaleNumber < 26:
+            self.canvas.currentSecondsScaleNumber += 1
+            self.canvas.rescale_axes()
 
     # box disconnection
     def disconnect_box(self, box):
@@ -178,12 +224,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def rschange(self):
         if self.canvas.animation_is_running:
             self.rsLabel.setText('Stop')
-            self.canvas.anim.event_source.stop()
             self.canvas.animation_is_running = False
         else:
             self.rsLabel.setText('Run')
-            self.canvas.anim.event_source.start()
             self.canvas.animation_is_running = True
+            self.canvas.cachelines = {"CH1": [[], []], "CH2": [[], []]}
 
     # function for Trigger
     def tgchange(self):
