@@ -7,13 +7,11 @@ import numpy as np
 
 class AnimatedMplCanvas(FigureCanvas):
     def __init__(self, parent=None):
+        # creating the main figure
         self.fig = Figure()
         self.fig.set_tight_layout(True)
-        self.axes = self.fig.add_subplot(111)
-        self.axes.set_ylim(-4, 4)
-        self.axes.set_xlim(-2, 2)
-        self.axes.grid(True)
 
+        # setting values for scaling
         self.voltsScaleValues = [(-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
@@ -35,17 +33,34 @@ class AnimatedMplCanvas(FigureCanvas):
                                    (-1, 1), (-2, 2), (-5, 5)]
         self.currentSecondsScaleNumber = 25
 
+        # initialising FigureCanvas, adding axes and lines
         super().__init__(self.fig)
         self.setParent(parent)
-        self.lines = {}
-        self.cachelines = {"CH1": [[], []], "CH2": [[], []]}
 
+        self.axes = self.fig.add_subplot(111)
+        self.axes.grid(True)
+        self.rescale_axes()
+
+        self.axes2 = self.axes.twinx()
+        self.axes2.set_ylim(-4, 4)
+        self.fig.add_axes(self.axes2)
+
+        self.axesDict = {"CH1": self.axes, "CH2": self.axes2}
+        self.channel_is_enabled = {"CH1": False, "CH2": False}
+        self.colors = {"CH1": "Blue", "CH2": "Red"}
+        self.lines = {}
+
+        for ch_name in self.axesDict.keys():
+            self.lines[ch_name] = \
+                self.axesDict[ch_name].add_line(Line2D([], [],
+                                                color=self.colors[ch_name]))
+            self.lines[ch_name].set_visible(False)
+        self.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
+
+        # creating animation
         self.anim = FuncAnimation(self.fig, self.animate,
                                   interval=20, blit=True)
         self.animation_is_running = True
-
-        self.channel_is_enabled = {"CH1": False, "CH2": False}
-        self.colors = {"CH1": "Blue", "CH2": "Red"}
 
     def animate(self, i):
         if self.animation_is_running:
@@ -59,17 +74,16 @@ class AnimatedMplCanvas(FigureCanvas):
         return tuple(self.lines.values())
 
     def enable_channel(self, ch_name):
-        self.lines[ch_name] = \
-            self.axes.add_line(Line2D([], [], color=self.colors[ch_name]))
+        self.lines[ch_name].set_visible(True)
         if not self.animation_is_running:
-            self.lines[ch_name].set_data(self.cachelines[ch_name])
+            self.lines[ch_name].set_data(self.saved_lines_data[ch_name])
         self.channel_is_enabled[ch_name] = True
 
     def disable_channel(self, ch_name):
-        self.channel_is_enabled[ch_name] = False
+        self.lines[ch_name].set_visible(False)
         if not self.animation_is_running:
-            self.cachelines[ch_name] = self.lines[ch_name].get_data()
-        self.lines.pop(ch_name).remove()
+            self.saved_lines_data[ch_name] = self.lines[ch_name].get_data()
+        self.channel_is_enabled[ch_name] = False
 
     def rescale_axes(self):
         self.axes.set_ylim(self.voltsScaleValues[self.currentVoltsScaleNumber])

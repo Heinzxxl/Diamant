@@ -21,7 +21,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.set_GlMode()
         self.add_canvas()
         self.checkbox_connection()
-        self.CH1_ctrl()
 
     # saving settings
     def save_settings(self):
@@ -44,7 +43,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # loading settings
     def load_settings(self):
-        self.CH1Box.setChecked(True)
         # Trigger conditions
         self.settings.beginGroup("Trigger")
         self._tgType = self.settings.value("Type", "Edge")
