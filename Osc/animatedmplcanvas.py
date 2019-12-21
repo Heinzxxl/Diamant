@@ -12,13 +12,13 @@ class AnimatedMplCanvas(FigureCanvas):
         self.fig.set_tight_layout(True)
 
         # setting values for scaling
-        self.voltsScaleValues = [(-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
+        self.voltsScaleLimits = [(-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
                                  (-200, 200), (-400, 400)]
-        self.currentVoltsScaleNumber = 5
+        self.currentVoltsScaleNumber = {"CH1": 5, "CH2": 5}
 
-        self.secondsScaleValues = [(-1e-08, 1e-08), (-2e-08, 2e-08),
+        self.secondsScaleLimits = [(-1e-08, 1e-08), (-2e-08, 2e-08),
                                    (-5e-08, 5e-08), (-1e-07, 1e-07),
                                    (-2e-07, 2e-07), (-5e-07, 5e-07),
                                    (-1e-06, 1e-06), (-2e-06, 2e-06),
@@ -38,8 +38,6 @@ class AnimatedMplCanvas(FigureCanvas):
         self.setParent(parent)
 
         self.axes = self.fig.add_subplot(111)
-        self.axes.grid(True)
-        self.rescale_axes()
 
         self.axes2 = self.axes.twinx()
         self.axes2.set_ylim(-4, 4)
@@ -49,6 +47,9 @@ class AnimatedMplCanvas(FigureCanvas):
         self.channel_is_enabled = {"CH1": False, "CH2": False}
         self.colors = {"CH1": "Blue", "CH2": "Red"}
         self.lines = {}
+
+        self.axes.grid(True)
+        self.rescale_axes()
 
         for ch_name in self.axesDict.keys():
             self.lines[ch_name] = \
@@ -86,7 +87,19 @@ class AnimatedMplCanvas(FigureCanvas):
         self.channel_is_enabled[ch_name] = False
 
     def rescale_axes(self):
-        self.axes.set_ylim(self.voltsScaleValues[self.currentVoltsScaleNumber])
-        self.axes.set_xlim(self.secondsScaleValues
-                           [self.currentSecondsScaleNumber])
+        ax_sec_limits = self.secondsScaleLimits[self.currentSecondsScaleNumber]
+        self.axes.set_xlim(ax_sec_limits)
+        ax_xstart, ax_xstop = ax_sec_limits
+        major_xticks = np.linspace(ax_xstart, ax_xstop, num=11)
+        self.axes.set_xticks(major_xticks)
+
+        for ch_name in self.axesDict.keys():
+            ax_volts_limits = \
+                self.voltsScaleLimits[self.currentVoltsScaleNumber[ch_name]]
+            self.axesDict[ch_name].set_ylim(ax_volts_limits)
+            ax_ystart, ax_ystop = ax_volts_limits
+            major_yticks = np.linspace(ax_ystart, ax_ystop, num=9)
+            self.axesDict[ch_name].set_yticks(major_yticks)
+            # self.axes2.get_yaxis().set_visible(False)
+
         self.draw()

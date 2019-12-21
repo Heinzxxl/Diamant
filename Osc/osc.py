@@ -40,6 +40,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue("Language", self._utLang)
         self.settings.setValue("Page", self._utPage)
         self.settings.endGroup()
+        # Measure conditions
+        self.settings.beginGroup("Measure")
+        self.settings.setValue("SelectedChannel", self._mrCH)
+        self.settings.endGroup()
 
     # loading settings
     def load_settings(self):
@@ -62,6 +66,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._utPsFl = "Off"
         self._utVMon = "Off"
         self._utPage = self.settings.value("Page", "Next Page")
+        self.settings.endGroup()
+        # Measure conditions
+        self.settings.beginGroup("Measure")
+        self._mrCH = self.settings.value("SelectedChannel", "CH1")
         self.settings.endGroup()
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
@@ -131,14 +139,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # zooming in/out
     def zoom_in_volts(self):
-        if self.canvas.currentVoltsScaleNumber > 0:
-            self.canvas.currentVoltsScaleNumber -= 1
-            self.canvas.rescale_axes()
+        if self.canvas.channel_is_enabled[self._mrCH]:
+            if self.canvas.currentVoltsScaleNumber[self._mrCH] > 0:
+                self.canvas.currentVoltsScaleNumber[self._mrCH] -= 1
+                self.canvas.rescale_axes()
 
     def zoom_out_volts(self):
-        if self.canvas.currentVoltsScaleNumber < 11:
-            self.canvas.currentVoltsScaleNumber += 1
-            self.canvas.rescale_axes()
+        if self.canvas.channel_is_enabled[self._mrCH]:
+            if self.canvas.currentVoltsScaleNumber[self._mrCH] < 11:
+                self.canvas.currentVoltsScaleNumber[self._mrCH] += 1
+                self.canvas.rescale_axes()
 
     def zoom_in_seconds(self):
         if self.canvas.currentSecondsScaleNumber > 0:
@@ -226,7 +236,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.rsLabel.setText('Run')
             self.canvas.animation_is_running = True
-            self.canvas.cachelines = {"CH1": [[], []], "CH2": [[], []]}
+            self.canvas.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
 
     # function for Trigger
     def tgchange(self):
@@ -322,6 +332,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._GlMode = "Measure"
         self.alldyndisconnect()
         self.clear_all_fields()
+
+        self.abconnect(self.dynBox1, self.mrslot1)
+        self.dynLabel1.setText("Selected Channel")
+        self.dynBox1.addItems(["CH1", "CH2"])
+        self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._mrCH))
+
+    # slots for Measure
+    def mrslot1(self):
+        self._mrCH = self.dynBox1.currentText()
 
     # function for Utility
     def utchange(self):
