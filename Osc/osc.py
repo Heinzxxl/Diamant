@@ -120,34 +120,51 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
 
-    # checkboxes connection
+    # checkboxes connection and binding channel labels with channel numbers
     def checkbox_connection(self):
         self.CH1Box.stateChanged.connect(self.CH1_ctrl)
         self.CH2Box.stateChanged.connect(self.CH2_ctrl)
+        self.CHLabels = {"CH1": self.CH1Label, "CH2": self.CH2Label}
 
     def CH1_ctrl(self):
         if self.CH1Box.isChecked():
             self.canvas.enable_channel("CH1")
+            self.CH1Box.setStyleSheet("QCheckBox{border: 2px solid blue;}")
+            vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH1"]]
+            self.CH1Label.setText("CH1 " + vPD)
         else:
             self.canvas.disable_channel("CH1")
+            self.CH1Box.setStyleSheet("")
+            self.CH1Label.clear()
 
     def CH2_ctrl(self):
         if self.CH2Box.isChecked():
             self.canvas.enable_channel("CH2")
+            self.CH2Box.setStyleSheet("QCheckBox{border: 2px solid red;}")
+            vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH2"]]
+            self.CH2Label.setText("CH2 " + vPD)
         else:
             self.canvas.disable_channel("CH2")
+            self.CH2Box.setStyleSheet("")
+            self.CH2Label.clear()
 
     # zooming in/out
     def zoom_in_volts(self):
         if self.canvas.channel_is_enabled[self._mrCH]:
             if self.canvas.currentVoltsScaleNumber[self._mrCH] > 0:
                 self.canvas.currentVoltsScaleNumber[self._mrCH] -= 1
+                scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
+                vPD = self.canvas.vPDiv[scaleNumber]
+                self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
                 self.canvas.rescale_axes()
 
     def zoom_out_volts(self):
         if self.canvas.channel_is_enabled[self._mrCH]:
             if self.canvas.currentVoltsScaleNumber[self._mrCH] < 11:
                 self.canvas.currentVoltsScaleNumber[self._mrCH] += 1
+                scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
+                vPD = self.canvas.vPDiv[scaleNumber]
+                self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
                 self.canvas.rescale_axes()
 
     def zoom_in_seconds(self):
@@ -167,7 +184,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             box.setStyleSheet(
                     "QComboBox::drop-down {border-width: 0px}" +
                     "QComboBox::down-arrow {image: none; border-width: 0px}" +
-                    "QComboBox{ border-top: 0px solid rgb(85, 0, 255);" +
+                    "QComboBox{border-top: 0px solid rgb(85, 0, 255);" +
                     "background:rgb(225, 225, 225)}")
             box.signalActivatedIsConnected = False
         if box.signalClickedIsConnected:

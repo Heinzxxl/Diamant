@@ -12,13 +12,15 @@ class AnimatedMplCanvas(FigureCanvas):
         self.fig.set_tight_layout(True)
 
         # setting values for scaling
-        self.voltsScaleLimits = [(-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
+        self.voltsScaleLimits = ((-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
-                                 (-200, 200), (-400, 400)]
+                                 (-200, 200), (-400, 400))
+        self.vPDiv = ("2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV",
+                      "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V")
         self.currentVoltsScaleNumber = {"CH1": 5, "CH2": 5}
 
-        self.secondsScaleLimits = [(-1e-08, 1e-08), (-2e-08, 2e-08),
+        self.secondsScaleLimits = ((-1e-08, 1e-08), (-2e-08, 2e-08),
                                    (-5e-08, 5e-08), (-1e-07, 1e-07),
                                    (-2e-07, 2e-07), (-5e-07, 5e-07),
                                    (-1e-06, 1e-06), (-2e-06, 2e-06),
@@ -30,7 +32,7 @@ class AnimatedMplCanvas(FigureCanvas):
                                    (-1e-02, 1e-02), (-2e-02, 2e-02),
                                    (-5e-02, 5e-02), (-1e-01, 1e-01),
                                    (-2e-01, 2e-01), (-5e-01, 5e-01),
-                                   (-1, 1), (-2, 2), (-5, 5)]
+                                   (-1, 1), (-2, 2), (-5, 5))
         self.currentSecondsScaleNumber = 25
 
         # initialising FigureCanvas, adding axes and lines
@@ -49,7 +51,6 @@ class AnimatedMplCanvas(FigureCanvas):
         self.lines = {}
 
         self.axes.grid(True)
-        self.rescale_axes()
 
         for ch_name in self.axesDict.keys():
             self.lines[ch_name] = \
@@ -57,17 +58,18 @@ class AnimatedMplCanvas(FigureCanvas):
                                                 color=self.colors[ch_name]))
             self.lines[ch_name].set_visible(False)
         self.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
-
         # creating animation
+        self.animation_is_running = True
         self.anim = FuncAnimation(self.fig, self.animate,
                                   interval=20, blit=True)
-        self.animation_is_running = True
+
+        self.rescale_axes()
 
     def animate(self, i):
         if self.animation_is_running:
             x = [-2, -1, 0, 1, 2]
             y = 2 * np.random.rand(5) - 1
-            y2 = 2 * np.random.rand(5) - 3
+            y2 = 2 * np.random.rand(5) - 1
             if self.channel_is_enabled["CH1"]:
                 self.lines["CH1"].set_data(x, y)
             if self.channel_is_enabled["CH2"]:
@@ -87,6 +89,10 @@ class AnimatedMplCanvas(FigureCanvas):
         self.channel_is_enabled[ch_name] = False
 
     def rescale_axes(self):
+        for ch_name in self.axesDict.keys():
+            self.axesDict[ch_name].clear()
+        self.axes.grid(True)
+
         ax_sec_limits = self.secondsScaleLimits[self.currentSecondsScaleNumber]
         self.axes.set_xlim(ax_sec_limits)
         ax_xstart, ax_xstop = ax_sec_limits
@@ -100,6 +106,6 @@ class AnimatedMplCanvas(FigureCanvas):
             ax_ystart, ax_ystop = ax_volts_limits
             major_yticks = np.linspace(ax_ystart, ax_ystop, num=9)
             self.axesDict[ch_name].set_yticks(major_yticks)
-            # self.axes2.get_yaxis().set_visible(False)
 
         self.draw()
+        self.flush_events()
