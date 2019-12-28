@@ -20,7 +20,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.init_button_connection()
         self.set_GlMode()
         self.add_canvas()
-        self.checkbox_connection()
+        self.ch_connection()
 
     # saving settings
     def save_settings(self):
@@ -121,7 +121,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.mplvl.addWidget(self.toolbar)
 
     # checkboxes connection and binding channel labels with channel numbers
-    def checkbox_connection(self):
+    def ch_connection(self):
         self.CH1Box.stateChanged.connect(self.CH1_ctrl)
         self.CH2Box.stateChanged.connect(self.CH2_ctrl)
         self.CHLabels = {"CH1": self.CH1Label, "CH2": self.CH2Label}
@@ -129,7 +129,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def CH1_ctrl(self):
         if self.CH1Box.isChecked():
             self.canvas.enable_channel("CH1")
-            self.CH1Box.setStyleSheet("QCheckBox{border: 2px solid blue;}")
+            self.CH1Box.setStyleSheet("QCheckBox{border: 2px solid " +
+                                      self.canvas.colors["CH1"] + ";}")
             vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH1"]]
             self.CH1Label.setText("CH1 " + vPD)
         else:
@@ -140,7 +141,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def CH2_ctrl(self):
         if self.CH2Box.isChecked():
             self.canvas.enable_channel("CH2")
-            self.CH2Box.setStyleSheet("QCheckBox{border: 2px solid red;}")
+            self.CH2Box.setStyleSheet("QCheckBox{border: 2px solid " +
+                                      self.canvas.colors["CH2"] + ";}")
             vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH2"]]
             self.CH2Label.setText("CH2 " + vPD)
         else:

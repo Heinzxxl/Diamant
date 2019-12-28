@@ -16,8 +16,8 @@ class AnimatedMplCanvas(FigureCanvas):
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
                                  (-200, 200), (-400, 400))
-        self.vPDiv = ("2 mV", "5 mV", "10 mV", "20 mV", "50 mV", "100 mV",
-                      "200 mV", "500 mV", "1 V", "2 V", "5 V", "10 V")
+        self.vPDiv = ("20 mV", "50 mV", "100 mV", "200 mV", "500 mV",
+                      "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V")
         self.currentVoltsScaleNumber = {"CH1": 5, "CH2": 5}
 
         self.secondsScaleLimits = ((-1e-08, 1e-08), (-2e-08, 2e-08),
@@ -40,18 +40,14 @@ class AnimatedMplCanvas(FigureCanvas):
         self.setParent(parent)
 
         self.axes = self.fig.add_subplot(111)
-
         self.axes2 = self.axes.twinx()
-        self.axes2.set_ylim(-4, 4)
         self.fig.add_axes(self.axes2)
-
         self.axesDict = {"CH1": self.axes, "CH2": self.axes2}
+
         self.channel_is_enabled = {"CH1": False, "CH2": False}
         self.colors = {"CH1": "Blue", "CH2": "Red"}
+
         self.lines = {}
-
-        self.axes.grid(True)
-
         for ch_name in self.axesDict.keys():
             self.lines[ch_name] = \
                 self.axesDict[ch_name].add_line(Line2D([], [],
@@ -65,6 +61,7 @@ class AnimatedMplCanvas(FigureCanvas):
 
         self.rescale_axes()
 
+    # animation function: updating plot data
     def animate(self, i):
         if self.animation_is_running:
             x = [-2, -1, 0, 1, 2]
@@ -76,18 +73,21 @@ class AnimatedMplCanvas(FigureCanvas):
                 self.lines["CH2"].set_data(x, y2)
         return tuple(self.lines.values())
 
+    # making lines visible
     def enable_channel(self, ch_name):
         self.lines[ch_name].set_visible(True)
         if not self.animation_is_running:
             self.lines[ch_name].set_data(self.saved_lines_data[ch_name])
         self.channel_is_enabled[ch_name] = True
 
+    # making lines non-visible
     def disable_channel(self, ch_name):
         self.lines[ch_name].set_visible(False)
         if not self.animation_is_running:
             self.saved_lines_data[ch_name] = self.lines[ch_name].get_data()
         self.channel_is_enabled[ch_name] = False
 
+    # rescaling axes
     def rescale_axes(self):
         for ch_name in self.axesDict.keys():
             self.axesDict[ch_name].clear()
