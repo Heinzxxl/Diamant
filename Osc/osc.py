@@ -116,6 +116,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def add_canvas(self):
         self.canvas = AnimatedMplCanvas()
         self.mplvl.addWidget(self.canvas)
+        tscaleNumber = self.canvas.currentSecondsScaleNumber
+        self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
         self.toolbar = NavigationToolbar(self.canvas,
                                          self.mplwidget, coordinates=True)
         self.mplvl.addWidget(self.toolbar)
@@ -172,11 +174,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def zoom_in_seconds(self):
         if self.canvas.currentSecondsScaleNumber > 0:
             self.canvas.currentSecondsScaleNumber -= 1
+            tscaleNumber = self.canvas.currentSecondsScaleNumber
+            self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
     def zoom_out_seconds(self):
         if self.canvas.currentSecondsScaleNumber < 26:
             self.canvas.currentSecondsScaleNumber += 1
+            tscaleNumber = self.canvas.currentSecondsScaleNumber
+            self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
     # box disconnection

@@ -49,9 +49,9 @@
        </widget>
       </item>
       <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="timeLabel">
         <property name="text">
-         <string>M 200ns</string>
+         <string/>
         </property>
        </widget>
       </item>

@@ -16,8 +16,16 @@ class AnimatedMplCanvas(FigureCanvas):
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
                                  (-200, 200), (-400, 400))
+
         self.vPDiv = ("20 mV", "50 mV", "100 mV", "200 mV", "500 mV",
                       "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V")
+        self.sPDiv = ("2 ns", "4 ns", "10 ns", "20 ns", "40 ns", "100 ns",
+                      "200 ns", "400 ns", "1 us",
+                      "2 us", "4 us", "10 us", "20 us", "40 us", "100 us",
+                      "200 us", "400 us", "1 ms",
+                      "2 ms", "4 ms", "10 ms", "20 ms", "40 ms", "100 ms",
+                      "200 ms", "400 ms", "1 s",)
+
         self.currentVoltsScaleNumber = {"CH1": 5, "CH2": 5}
 
         self.secondsScaleLimits = ((-1e-08, 1e-08), (-2e-08, 2e-08),
@@ -54,6 +62,7 @@ class AnimatedMplCanvas(FigureCanvas):
                                                 color=self.colors[ch_name]))
             self.lines[ch_name].set_visible(False)
         self.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
+
         # creating animation
         self.animation_is_running = True
         self.anim = FuncAnimation(self.fig, self.animate,
@@ -106,6 +115,9 @@ class AnimatedMplCanvas(FigureCanvas):
             ax_ystart, ax_ystop = ax_volts_limits
             major_yticks = np.linspace(ax_ystart, ax_ystop, num=9)
             self.axesDict[ch_name].set_yticks(major_yticks)
+            self.axesDict[ch_name].tick_params(labelbottom=False,
+                                               labelleft=False,
+                                               labelright=False)
 
         self.draw()
         self.flush_events()
