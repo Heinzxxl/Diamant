@@ -3,6 +3,7 @@ from matplotlib.backends.backend_qt5agg import (
         NavigationToolbar2QT as NavigationToolbar)
 import sys
 from animatedmplcanvas import AnimatedMplCanvas
+from udso import uDso
 
 Ui_MainWindow, QMainWindow = uic.loadUiType('osc.ui')
 
@@ -21,6 +22,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.set_GlMode()
         self.add_canvas()
         self.ch_connection()
+        self.rsLabel.setText('Stop')
+
+        # uDso
+        self.osc = uDso()
+        self.osc.dataIsReady.connect(self.process_data)
 
     # saving settings
     def save_settings(self):
@@ -77,7 +83,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # closing'n'saving
     def closeEvent(self, event):
         self.save_settings()
+        self.osc.uDsoSDKShutdown()
         sys.exit()
+
+    def process_data(self):
+        temp1 = list(range(self.osc.dbWaveData_Length))
+        temp2 = self.osc.data_
+        self.canvas.drawDataX = [i*1e-6 for i in temp1]
+        self.canvas.drawDataY = [i*1e-6 for i in temp2]
+        self.canvas.enable_drawing()
+        self.rsLabel.setText('Stop')
 
     # initial connections
     def init_button_connection(self):
@@ -262,6 +277,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.rsLabel.setText('Run')
             self.canvas.animation_is_running = True
             self.canvas.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
+            self.osc.SingleShot()
 
     # function for Trigger
     def tgchange(self):

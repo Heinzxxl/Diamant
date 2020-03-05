@@ -64,22 +64,30 @@ class AnimatedMplCanvas(FigureCanvas):
         self.saved_lines_data = {"CH1": [[], []], "CH2": [[], []]}
 
         # creating animation
-        self.animation_is_running = True
+        self.animation_is_running = False
         self.anim = FuncAnimation(self.fig, self.animate,
                                   interval=20, blit=True)
 
         self.rescale_axes()
+
+        # drawing data
+        self.readyToDraw = 0
+        self.drawDataX = []
+        self.drawDataY = []
 
     # animation function: updating plot data
     def animate(self, i):
         if self.animation_is_running:
             x = [-2, -1, 0, 1, 2]
             y = 2 * np.random.rand(5) - 1
-            y2 = 2 * np.random.rand(5) - 1
+#            y2 = 2 * np.random.rand(5) - 1
             if self.channel_is_enabled["CH1"]:
-                self.lines["CH1"].set_data(x, y)
+                if self.readyToDraw:
+                    self.lines["CH1"].set_data(self.drawDataX,
+                                               self.drawDataY)
+                    self.readyToDraw = 0
             if self.channel_is_enabled["CH2"]:
-                self.lines["CH2"].set_data(x, y2)
+                self.lines["CH2"].set_data(x, y)
         return tuple(self.lines.values())
 
     # making lines visible
@@ -121,3 +129,6 @@ class AnimatedMplCanvas(FigureCanvas):
 
         self.draw()
         self.flush_events()
+
+    def enable_drawing(self):
+        self.readyToDraw = 1
