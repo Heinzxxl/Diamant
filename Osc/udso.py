@@ -1,24 +1,24 @@
-import win32gui
+import numpy as np
 import ctypes
 
-import numpy as np
-import matplotlib.pyplot as plt
-
 from ctypes import *
-from ctypes.wintypes import HWND, LPCSTR, LPSTR
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QCoreApplication
 
 
 class uDso(QObject):
 
     dataIsReady = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
         self.lib_import()
         self._uDsoSDKInit_()
+
+        self.uDsoSDKSetRecordLength.argtypes = (c_int, )
+        self.uDsoSDKSetRecordLength.restype = c_bool
         self._uDsoSDKSetRecordLength_(10000)
 
         self.uDsoSDKSetEdgeTrig.argtypes = (c_int, c_int, c_int64)
@@ -54,6 +54,7 @@ class uDso(QObject):
         self.uDsoSDKSetWaitMode.argtypes = (c_int, c_int64, )
         self.uDsoSDKSetWaitMode.restype = c_bool
 
+        self.isInterrupted = False
 
     # importing acute-library
     def lib_import(self):
@@ -136,9 +137,6 @@ class uDso(QObject):
 
     # uDsoSDKSetRecordLength(ByVal iRecordLength As Integer) As Boolean
     def _uDsoSDKSetRecordLength_(self, RecordLength):
-        self.uDsoSDKSetRecordLength.argtypes = (c_int, )
-        self.uDsoSDKSetRecordLength.restype = c_bool
-
         self.iRecordLength = c_int(RecordLength)  # value for TS2202E (10kB)
         self.uDsoSDKSetRecordLength(self.iRecordLength)
         self.iRecordLength_value = self.iRecordLength.value
@@ -162,7 +160,7 @@ class uDso(QObject):
 
         self.uDsoSDKSetVoltDiv(self.iCh, self.iVoltDiv_uV)
 
-    #BOOL uDsoSDKSetSampleRate(__int64 i64SampleRate)
+    # BOOL uDsoSDKSetSampleRate(__int64 i64SampleRate)
     def _uDsoSDKSetSampleRate_(self, SampleRate):
         self.i64SampleRate = c_int64(SampleRate)
 
@@ -179,20 +177,32 @@ class uDso(QObject):
         self.uDsoSDKReadDbl_uv(self.iDev, pointer(self.iFlag),
                                self.dbWaveData, self.iProbe)
     
-        #BOOL uDsoSDKSetWaitMode(int iWaitMode, __int64 i64CustomWaitTime_ps)
+    # BOOL uDsoSDKSetWaitMode(int iWaitMode, __int64 i64CustomWaitTime_ps)
     def _uDsoSDKSetWaitMode_(self, WaitMode, CustomWaitTime_ps = 0):      
         self.iWaitMode = c_int(WaitMode) # WAIT_FOREVER 2 
         self.i64CustomWaitTime_ps = c_int64(CustomWaitTime_ps)
         self.uDsoSDKSetWaitMode(self.iWaitMode, self.i64CustomWaitTime_ps)
 
     def SingleShot(self):
+        self.isInterrupted = False
         self._uDsoSDKSetWaitMode_(2)
         self.uDsoSDKCaptureEx()
-
+        print("capturing")
         while self.uDsoSDKDataReady() is False:
+            QCoreApplication.processEvents()
+            if self.isInterrupted is True:
+                break
             pass
 
+        if self.isInterrupted is True:
+            self.uDsoSDKStop()
+            self.dataIsReady.emit()
+            return
         self._uDsoSDKReadDbl_uv_(0, 0)
         self.data_ = np.frombuffer(self.dbWaveData, float)
         self.uDsoSDKStop()
         self.dataIsReady.emit()
+
+    def stopCapturing(self):
+        self.isInterrupted = True
+        print("uDso", self.isInterrupted)

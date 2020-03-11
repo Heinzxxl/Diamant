@@ -86,6 +86,7 @@ class AnimatedMplCanvas(FigureCanvas):
                     self.lines["CH1"].set_data(self.drawDataX,
                                                self.drawDataY)
                     self.readyToDraw = 0
+                    self.animation_is_running = False
             if self.channel_is_enabled["CH2"]:
                 self.lines["CH2"].set_data(x, y)
         return tuple(self.lines.values())
