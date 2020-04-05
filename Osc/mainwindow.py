@@ -306,6 +306,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.canvas.animation_is_running = False
                 self.rsLabel.setText('Stop')
+                return
         if self.canvas.animation_is_running is False:
             if self.mutex.tryLock() is False:
                 return
