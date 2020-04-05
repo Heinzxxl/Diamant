@@ -1,5 +1,6 @@
 import numpy as np
 import ctypes
+import os.path
 
 from ctypes import *
 
@@ -9,13 +10,17 @@ from PyQt5.QtCore import QCoreApplication
 
 
 class uDso(QObject):
-
-    dataIsReady = pyqtSignal()
-
     def __init__(self, parent=None):
         super().__init__()
         self.lib_import()
-        self._uDsoSDKInit_()
+        self.isInterrupted = False
+        self.isDemo = False
+
+        self.uDsoSDKInit.restype = c_bool
+        if self._uDsoSDKInit_() is False:
+            print("No DSO found. Entering Demo Mode...")
+            self.isDemo = True
+            return
 
         self.uDsoSDKSetRecordLength.argtypes = (c_int, )
         self.uDsoSDKSetRecordLength.restype = c_bool
@@ -32,6 +37,9 @@ class uDso(QObject):
         self.uDsoSDKSetSampleRate.argtypes = (c_int64, )
         self.uDsoSDKSetSampleRate.restype = c_bool
         self._uDsoSDKSetSampleRate_(1000000)
+        
+        self.uDsoSDKGetSampleRate.argtypes = (POINTER(c_int), )
+        self.uDsoSDKGetSampleRate.restype = c_bool
 
         self.uDsoSDKCaptureEx.restype = c_bool
         self.uDsoSDKDataReady.restype = c_bool
@@ -54,11 +62,11 @@ class uDso(QObject):
         self.uDsoSDKSetWaitMode.argtypes = (c_int, c_int64, )
         self.uDsoSDKSetWaitMode.restype = c_bool
 
-        self.isInterrupted = False
-
     # importing acute-library
     def lib_import(self):
-        DSOSDK_dll = WinDLL("DSOSDK.dll")
+        dll_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "DSOSDK.dll")
+        DSOSDK_dll = WinDLL(dll_file)
         self.fInit = False
         self.fRepeat = False
         self.fDataReady = False
@@ -133,7 +141,7 @@ class uDso(QObject):
         self.uDsoSDKGetSerialNum = DSOSDK_dll.uDsoSDKGetSerialNum
 
     def _uDsoSDKInit_(self):
-        self.uDsoSDKInit()
+        return self.uDsoSDKInit()
 
     # uDsoSDKSetRecordLength(ByVal iRecordLength As Integer) As Boolean
     def _uDsoSDKSetRecordLength_(self, RecordLength):
@@ -182,27 +190,3 @@ class uDso(QObject):
         self.iWaitMode = c_int(WaitMode) # WAIT_FOREVER 2 
         self.i64CustomWaitTime_ps = c_int64(CustomWaitTime_ps)
         self.uDsoSDKSetWaitMode(self.iWaitMode, self.i64CustomWaitTime_ps)
-
-    def SingleShot(self):
-        self.isInterrupted = False
-        self._uDsoSDKSetWaitMode_(2)
-        self.uDsoSDKCaptureEx()
-        print("capturing")
-        while self.uDsoSDKDataReady() is False:
-            QCoreApplication.processEvents()
-            if self.isInterrupted is True:
-                break
-            pass
-
-        if self.isInterrupted is True:
-            self.uDsoSDKStop()
-            self.dataIsReady.emit()
-            return
-        self._uDsoSDKReadDbl_uv_(0, 0)
-        self.data_ = np.frombuffer(self.dbWaveData, float)
-        self.uDsoSDKStop()
-        self.dataIsReady.emit()
-
-    def stopCapturing(self):
-        self.isInterrupted = True
-        print("uDso", self.isInterrupted)

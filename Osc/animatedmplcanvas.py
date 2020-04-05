@@ -6,10 +6,12 @@ import numpy as np
 
 
 class AnimatedMplCanvas(FigureCanvas):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, demoFlag=False):
         # creating the main figure
         self.fig = Figure()
         self.fig.set_tight_layout(True)
+        self.readyToDraw = False
+        self.DMode = demoFlag
 
         # setting values for scaling
         self.voltsScaleLimits = ((-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
@@ -65,30 +67,42 @@ class AnimatedMplCanvas(FigureCanvas):
 
         # creating animation
         self.animation_is_running = False
-        self.anim = FuncAnimation(self.fig, self.animate,
-                                  interval=20, blit=True)
+        if self.DMode is False:
+            self.anim = FuncAnimation(self.fig, self.animate,
+                                      interval=20, blit=True)
+        else:
+            self.anim = FuncAnimation(self.fig, self.demo_animate,
+                                      interval=20, blit=True)
 
         self.rescale_axes()
 
         # drawing data
-        self.readyToDraw = 0
         self.drawDataX = []
         self.drawDataY = []
 
     # animation function: updating plot data
     def animate(self, i):
         if self.animation_is_running:
-            x = [-2, -1, 0, 1, 2]
-            y = 2 * np.random.rand(5) - 1
-#            y2 = 2 * np.random.rand(5) - 1
             if self.channel_is_enabled["CH1"]:
                 if self.readyToDraw:
                     self.lines["CH1"].set_data(self.drawDataX,
                                                self.drawDataY)
-                    self.readyToDraw = 0
+                    self.readyToDraw = False
                     self.animation_is_running = False
             if self.channel_is_enabled["CH2"]:
-                self.lines["CH2"].set_data(x, y)
+                pass
+        return tuple(self.lines.values())
+
+    # demo animation function: updating plot data
+    def demo_animate(self, i):
+        if self.animation_is_running:
+            x = np.linspace(-5,5,20)
+            y = np.random.rand(20)-0.5
+            y2 = np.random.rand(20)-0.5
+            if self.channel_is_enabled["CH1"]:
+                self.lines["CH1"].set_data(x,y)
+            if self.channel_is_enabled["CH2"]:
+                self.lines["CH2"].set_data(x,y2)
         return tuple(self.lines.values())
 
     # making lines visible
@@ -132,4 +146,4 @@ class AnimatedMplCanvas(FigureCanvas):
         self.flush_events()
 
     def enable_drawing(self):
-        self.readyToDraw = 1
+        self.readyToDraw = True

@@ -1,5 +1,6 @@
 import numpy as np
 import ctypes
+import os.path
 
 from ctypes import *
 from PyQt5 import QtCore
@@ -41,7 +42,9 @@ class Capt(QtCore.QObject):
         self.isInterrupted = False
 
     def import_lib(self):
-        DSOSDK_dll = WinDLL("DSOSDK.dll")
+        dll_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "DSOSDK.dll")
+        DSOSDK_dll = WinDLL(dll_file)
 
         # BOOL uDsoSDKCaptureEx()
         self.uDsoSDKCaptureEx = DSOSDK_dll.uDsoSDKCaptureEx

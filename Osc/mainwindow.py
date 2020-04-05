@@ -2,6 +2,8 @@ from PyQt5 import QtWidgets, QtCore, uic
 from matplotlib.backends.backend_qt5agg import (
         NavigationToolbar2QT as NavigationToolbar)
 import sys
+import ctypes
+import numpy as np
 
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
@@ -23,15 +25,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings = QtCore.QSettings("MySoft", "Osc")
         self.load_settings()
 
+        # uDso
+        self.osc = uDso()
+
         # current setup
         self.init_button_connection()
         self.set_GlMode()
         self.add_canvas()
         self.ch_connection()
         self.rsLabel.setText('Stop')
-
-        # uDso
-        self.osc = uDso()
         self.startDrawing.connect(self.canvas.enable_drawing)
 
         # mutex
@@ -101,9 +103,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.rsLabel.setText('Stop')
             self.mutex.unlock()
             return
-        temp1 = list(range(self.cptr.dbWaveData_Length))
+        length = self.cptr.dbWaveData_Length
+        temp1 = np.arange(-length/2, length/2)
         temp2 = self.cptr.data_
-        self.canvas.drawDataX = [i*1e-6 for i in temp1]
+        temp2_spl = np.split(temp2, 2)
+        temp2 = np.concatenate((temp2_spl[1], temp2_spl[0]))
+        self.i64SampleRate = ctypes.c_int()
+        self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
+        self.timeFactor = 1./self.i64SampleRate.value
+        self.canvas.drawDataX = [i*self.timeFactor for i in temp1]
         self.canvas.drawDataY = [i*1e-6 for i in temp2]
         self.startDrawing.emit()
         self.rsLabel.setText('Stop')
@@ -144,7 +152,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # adding canvas to mplwidget
     def add_canvas(self):
-        self.canvas = AnimatedMplCanvas()
+        if self.osc.isDemo is True:
+            self.canvas = AnimatedMplCanvas(demoFlag=True)
+        else:
+            self.canvas = AnimatedMplCanvas(demoFlag=False)
         self.mplvl.addWidget(self.canvas)
         tscaleNumber = self.canvas.currentSecondsScaleNumber
         self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
@@ -285,6 +296,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for Run/Stop
     def rschange(self):
+        if self.osc.isDemo is True:
+            if self.canvas.animation_is_running is False:
+                self.canvas.animation_is_running = True
+                self.rsLabel.setText('Run')
+                self.canvas.saved_lines_data = {"CH1": [[], []], 
+                                                "CH2": [[], []]}
+                return
+            else:
+                self.canvas.animation_is_running = False
+                self.rsLabel.setText('Stop')
         if self.canvas.animation_is_running is False:
             if self.mutex.tryLock() is False:
                 return
