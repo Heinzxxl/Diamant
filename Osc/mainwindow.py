@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import (
 import sys
 import ctypes
 import numpy as np
+import math
 
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
@@ -216,6 +217,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.canvas.currentSecondsScaleNumber > 0:
             self.canvas.currentSecondsScaleNumber -= 1
             tscaleNumber = self.canvas.currentSecondsScaleNumber
+            rightBorder = self.canvas.secondsScaleLimits[tscaleNumber][1]
+            sampleRate = math.ceil(5000/rightBorder)
+            self.osc._uDsoSDKSetSampleRate_(sampleRate)
             self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
@@ -223,6 +227,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.canvas.currentSecondsScaleNumber < 26:
             self.canvas.currentSecondsScaleNumber += 1
             tscaleNumber = self.canvas.currentSecondsScaleNumber
+            rightBorder = self.canvas.secondsScaleLimits[tscaleNumber][1]
+            sampleRate = math.ceil(5000/rightBorder)
+            self.osc._uDsoSDKSetSampleRate_(sampleRate)
             self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
