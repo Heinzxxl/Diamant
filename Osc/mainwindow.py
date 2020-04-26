@@ -104,10 +104,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.mutex.unlock()
             return
         length = self.cptr.dbWaveData_Length
-        temp1 = np.arange(-length/2, length/2)
+        temp1 = np.arange(-length/4, length/4)
         temp2 = self.cptr.data_
         temp2_spl = np.split(temp2, 2)
-        temp2 = np.concatenate((temp2_spl[1], temp2_spl[0]))
+        temp2 = temp2_spl[0]
         self.i64SampleRate = ctypes.c_int()
         self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
         self.timeFactor = 1./self.i64SampleRate.value
@@ -302,11 +302,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.rsLabel.setText('Run')
                 self.canvas.saved_lines_data = {"CH1": [[], []], 
                                                 "CH2": [[], []]}
-                return
             else:
                 self.canvas.animation_is_running = False
                 self.rsLabel.setText('Stop')
-                return
+            return
         if self.canvas.animation_is_running is False:
             if self.mutex.tryLock() is False:
                 return

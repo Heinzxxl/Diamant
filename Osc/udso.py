@@ -66,7 +66,10 @@ class uDso(QObject):
     def lib_import(self):
         dll_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 "DSOSDK.dll")
+        dll_file_2 = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "DsoRun.dll")
         DSOSDK_dll = WinDLL(dll_file)
+        DsoRun_dll = WinDLL(dll_file_2)
         self.fInit = False
         self.fRepeat = False
         self.fDataReady = False

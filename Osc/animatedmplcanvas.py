@@ -28,7 +28,7 @@ class AnimatedMplCanvas(FigureCanvas):
                       "2 ms", "4 ms", "10 ms", "20 ms", "40 ms", "100 ms",
                       "200 ms", "400 ms", "1 s",)
 
-        self.currentVoltsScaleNumber = {"CH1": 5, "CH2": 5}
+        self.currentVoltsScaleNumber = {"CH1": 3, "CH2": 3}
 
         self.secondsScaleLimits = ((-1e-08, 1e-08), (-2e-08, 2e-08),
                                    (-5e-08, 5e-08), (-1e-07, 1e-07),
@@ -43,7 +43,7 @@ class AnimatedMplCanvas(FigureCanvas):
                                    (-5e-02, 5e-02), (-1e-01, 1e-01),
                                    (-2e-01, 2e-01), (-5e-01, 5e-01),
                                    (-1, 1), (-2, 2), (-5, 5))
-        self.currentSecondsScaleNumber = 25
+        self.currentSecondsScaleNumber = 17
 
         # initialising FigureCanvas, adding axes and lines
         super().__init__(self.fig)
