@@ -21,6 +21,9 @@ class Capt(QtCore.QObject):
         self.uDsoSDKCaptureEx.restype = c_bool
         self.uDsoSDKDataReady.restype = c_bool
 
+        self.uDsoSDKGetStatus.argtype = c_int        
+        self.uDsoSDKGetStatus.restype = c_int
+
         self.uDsoSDKReadDbl_uv.argtypes = (c_int, POINTER(c_int),
                                            POINTER(c_double), POINTER(c_int))
         self.uDsoSDKReadDbl_uv.restype = c_bool
@@ -49,6 +52,8 @@ class Capt(QtCore.QObject):
         # BOOL uDsoSDKCaptureEx()
         self.uDsoSDKCaptureEx = DSOSDK_dll.uDsoSDKCaptureEx
         self.uDsoSDKDataReady = DSOSDK_dll.uDsoSDKDataReady  # BOOL
+        
+        self.uDsoSDKGetStatus = DSOSDK_dll.uDsoSDKGetStatus
 
         # int uDsoSDKStop()
         self.uDsoSDKStop = DSOSDK_dll.uDsoSDKStop
@@ -87,10 +92,15 @@ class Capt(QtCore.QObject):
         self.isInterrupted = False
         self._uDsoSDKSetWaitMode_(2)
         self.uDsoSDKCaptureEx()
+        iDev = c_int()
+        i = 0
         while self.uDsoSDKDataReady() is False:
             QtCore.QCoreApplication.processEvents()
             if self.isInterrupted is True:
                 break
+            print(self.uDsoSDKGetStatus(iDev))
+            print(i)
+            i+=1
             pass
 
         if self.isInterrupted is True:

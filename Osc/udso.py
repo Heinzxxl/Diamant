@@ -33,6 +33,9 @@ class uDso(QObject):
         self.uDsoSDKSetVoltDiv.argtypes = (c_int, c_int)
         self.uDsoSDKSetVoltDiv.restype = c_bool
         self._uDsoSDKSetVoltDiv_(0, 200000)
+        
+        self.uDsoSDKGetVoltDiv.argtypes = (c_int, POINTER(c_int))
+        self.uDsoSDKGetVoltDiv.restype = c_bool
 
         self.uDsoSDKSetSampleRate.argtypes = (c_int64, )
         self.uDsoSDKSetSampleRate.restype = c_bool
@@ -170,6 +173,13 @@ class uDso(QObject):
         self.iCh = c_int(Ch)
 
         self.uDsoSDKSetVoltDiv(self.iCh, self.iVoltDiv_uV)
+
+    # BOOL uDsoSDKGetVoltDiv(int iCh, int & iVoltDiv_uV)\n",
+    def _uDsoSDKGetVoltDiv_(self, Ch):
+        iVoltDiv_uV = c_int()
+        iCh = c_int(Ch)
+        self.uDsoSDKGetVoltDiv(iCh, pointer(iVoltDiv_uV))
+        print (iVoltDiv_uV.value * 1e-3, 'mV')
 
     # BOOL uDsoSDKSetSampleRate(__int64 i64SampleRate)
     def _uDsoSDKSetSampleRate_(self, SampleRate):

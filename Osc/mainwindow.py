@@ -4,7 +4,6 @@ from matplotlib.backends.backend_qt5agg import (
 import sys
 import ctypes
 import numpy as np
-import math
 
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
@@ -28,6 +27,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         # uDso
         self.osc = uDso()
+        if self.osc.isDemo is False:
+            self.setupDso()
 
         # current setup
         self.init_button_connection()
@@ -91,12 +92,22 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.endGroup()
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
+        # Necessary data
+        self.ch_number = {"CH1": 0, "CH2": 1}
+        self.slope_number = {"Rising": 0, "Falling": 1}
 
     # closing'n'saving
     def closeEvent(self, event):
         self.save_settings()
         self.osc.uDsoSDKShutdown()
         sys.exit()
+
+    # setting up Dso
+    def setupDso(self):
+        sourceCh = self.ch_number[self._tgSource]
+        trigSlope = self.slope_number[self._tgSlope]
+        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
+        self.osc._uDsoSDKGetVoltDiv_(0)
 
     def process_data(self):
         if self.cptr.isInterrupted is True:
@@ -108,12 +119,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         temp1 = np.arange(-length/4, length/4)
         temp2 = self.cptr.data_
         temp2_spl = np.split(temp2, 2)
-        temp2 = temp2_spl[0]
+        tempCH1 = temp2_spl[0]
+        tempCH2 = temp2_spl[1]
         self.i64SampleRate = ctypes.c_int()
         self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
         self.timeFactor = 1./self.i64SampleRate.value
         self.canvas.drawDataX = [i*self.timeFactor for i in temp1]
-        self.canvas.drawDataY = [i*1e-6 for i in temp2]
+        self.canvas.drawDataY_1 = [i*1e-6 for i in tempCH1]
+        self.canvas.drawDataY_2 = [i*1e-6 for i in tempCH2]
         self.startDrawing.emit()
         self.rsLabel.setText('Stop')
         self.mutex.unlock()
@@ -201,6 +214,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.canvas.currentVoltsScaleNumber[self._mrCH] -= 1
                 scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
                 vPD = self.canvas.vPDiv[scaleNumber]
+                vPD_num = self.canvas.vPDiv_num[scaleNumber]
+                ch_num = self.canvas.channelNum[self._mrCH]
+                if self.osc.isDemo is False:
+                    self.osc._uDsoSDKSetVoltDiv_(ch_num, vPD_num)
+                    self.osc._uDsoSDKGetVoltDiv_(0)
                 self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
                 self.canvas.rescale_axes()
 
@@ -210,6 +228,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.canvas.currentVoltsScaleNumber[self._mrCH] += 1
                 scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
                 vPD = self.canvas.vPDiv[scaleNumber]
+                vPD_num = self.canvas.vPDiv_num[scaleNumber]
+                ch_num = self.canvas.channelNum[self._mrCH]
+                if self.osc.isDemo is False:
+                    self.osc._uDsoSDKSetVoltDiv_(ch_num, vPD_num)
+                    self.osc._uDsoSDKGetVoltDiv_(0)
                 self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
                 self.canvas.rescale_axes()
 
@@ -217,9 +240,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.canvas.currentSecondsScaleNumber > 0:
             self.canvas.currentSecondsScaleNumber -= 1
             tscaleNumber = self.canvas.currentSecondsScaleNumber
-            rightBorder = self.canvas.secondsScaleLimits[tscaleNumber][1]
-            sampleRate = math.ceil(5000/rightBorder)
-            self.osc._uDsoSDKSetSampleRate_(sampleRate)
+            sampleRate = self.canvas.sPDiv_num[tscaleNumber]
+            if self.osc.isDemo is False:
+                self.osc._uDsoSDKSetSampleRate_(sampleRate)
             self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
@@ -227,9 +250,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.canvas.currentSecondsScaleNumber < 26:
             self.canvas.currentSecondsScaleNumber += 1
             tscaleNumber = self.canvas.currentSecondsScaleNumber
-            rightBorder = self.canvas.secondsScaleLimits[tscaleNumber][1]
-            sampleRate = math.ceil(5000/rightBorder)
-            self.osc._uDsoSDKSetSampleRate_(sampleRate)
+            sampleRate = self.canvas.sPDiv_num[tscaleNumber]
+            if self.osc.isDemo is False:
+                self.osc._uDsoSDKSetSampleRate_(sampleRate)
             self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
             self.canvas.rescale_axes()
 
@@ -365,9 +388,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.dynBox2.setCurrentIndex(self.dynBox2.findText(self._tgMode))
 
         self.dynLabel3.setText("Record Length")
-        self.dynBox3.addItems(["500 (20 us)", "1K (20 us)", "2K (20 us)",
-                               "4K (40 us)", "8K (80 us)", "16K (160 us)",
-                               "32K (320 us)", "64K (640 us)"])
+        self.dynBox3.addItems(["10K"])
         self.dynBox3.setCurrentIndex(self.dynBox3.findText(self._tgRLength))
 
         self.dynLabel4.setText("Source")
@@ -411,9 +432,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def tgslot4(self):
         self._tgSource = self.dynBox4.currentText()
+        if self.osc.isDemo is True:
+            return
+        sourceCh = self.ch_number[self._tgSource]
+        trigSlope = self.slope_number[self._tgSlope]
+        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
 
     def tgslot6a(self):
         self._tgSlope = self.dynBox6.currentText()
+        if self.osc.isDemo is True:
+            return
+        sourceCh = self.ch_number[self._tgSource]
+        trigSlope = self.slope_number[self._tgSlope]
+        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
 
     def tgslot6b(self):
         self._tgVideo = self.dynBox6.currentText()

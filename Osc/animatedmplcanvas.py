@@ -18,18 +18,7 @@ class AnimatedMplCanvas(FigureCanvas):
                                  (-0.8, 0.8), (-2, 2), (-4, 4), (-8, 8),
                                  (-20, 20), (-40, 40), (-80, 80),
                                  (-200, 200), (-400, 400))
-
-        self.vPDiv = ("20 mV", "50 mV", "100 mV", "200 mV", "500 mV",
-                      "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V")
-        self.sPDiv = ("2 ns", "4 ns", "10 ns", "20 ns", "40 ns", "100 ns",
-                      "200 ns", "400 ns", "1 us",
-                      "2 us", "4 us", "10 us", "20 us", "40 us", "100 us",
-                      "200 us", "400 us", "1 ms",
-                      "2 ms", "4 ms", "10 ms", "20 ms", "40 ms", "100 ms",
-                      "200 ms", "400 ms", "1 s",)
-
-        self.currentVoltsScaleNumber = {"CH1": 3, "CH2": 3}
-
+        
         self.secondsScaleLimits = ((-1e-08, 1e-08), (-2e-08, 2e-08),
                                    (-5e-08, 5e-08), (-1e-07, 1e-07),
                                    (-2e-07, 2e-07), (-5e-07, 5e-07),
@@ -43,7 +32,35 @@ class AnimatedMplCanvas(FigureCanvas):
                                    (-5e-02, 5e-02), (-1e-01, 1e-01),
                                    (-2e-01, 2e-01), (-5e-01, 5e-01),
                                    (-1, 1), (-2, 2), (-5, 5))
+
+        self.vPDiv = ("20 mV", "50 mV", "100 mV", "200 mV", "500 mV",
+                      "1 V", "2 V", "5 V", "10 V", "20 V", "50 V", "100 V")
+        
+        self.sPDiv = ("2 ns", "4 ns", "10 ns", "20 ns", "40 ns", "100 ns",
+                      "200 ns", "400 ns", "1 us",
+                      "2 us", "4 us", "10 us", "20 us", "40 us", "100 us",
+                      "200 us", "400 us", "1 ms",
+                      "2 ms", "4 ms", "10 ms", "20 ms", "40 ms", "100 ms",
+                      "200 ms", "400 ms", "1 s",)
+
+        self.vPDiv_num = (20000, 50000, 100000, 200000,
+                          500000, 1000000, 2000000, 5000000,
+                          10000000, 20000000, 50000000, 100000000)        
+
+        self.sPDiv_num = (500000000000, 250000000000, 100000000000,
+                          50000000000, 25000000000, 10000000000,
+                          5000000000, 2500000000, 1000000000,
+                          500000000, 250000000, 100000000,
+                          50000000, 25000000, 10000000,
+                          5000000, 2500000, 1000000, 500000,
+                          250000, 100000, 50000,
+                          25000, 10000, 5000, 2500, 1000)
+
+        self.currentVoltsScaleNumber = {"CH1": 3, "CH2": 3}
+
         self.currentSecondsScaleNumber = 17
+        
+        self.channelNum = {"CH1": 0, "CH2": 1}
 
         # initialising FigureCanvas, adding axes and lines
         super().__init__(self.fig)
@@ -78,7 +95,7 @@ class AnimatedMplCanvas(FigureCanvas):
 
         # drawing data
         self.drawDataX = []
-        self.drawDataY = []
+        self.drawDataY_1 = []
 
     # animation function: updating plot data
     def animate(self, i):
@@ -86,11 +103,15 @@ class AnimatedMplCanvas(FigureCanvas):
             if self.channel_is_enabled["CH1"]:
                 if self.readyToDraw:
                     self.lines["CH1"].set_data(self.drawDataX,
-                                               self.drawDataY)
+                                               self.drawDataY_1)
                     self.readyToDraw = False
                     self.animation_is_running = False
             if self.channel_is_enabled["CH2"]:
-                pass
+                if self.readyToDraw:
+                    self.lines["CH1"].set_data(self.drawDataX,
+                                               self.drawDataY_2)
+                    self.readyToDraw = False
+                    self.animation_is_running = False
         return tuple(self.lines.values())
 
     # demo animation function: updating plot data
