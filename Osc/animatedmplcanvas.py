@@ -2,10 +2,14 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.animation import FuncAnimation
+from PyQt5 import QtCore
 import numpy as np
 
 
 class AnimatedMplCanvas(FigureCanvas):
+
+    runAgain = QtCore.pyqtSignal()
+
     def __init__(self, parent=None, demoFlag=False):
         # creating the main figure
         self.fig = Figure()
@@ -106,12 +110,14 @@ class AnimatedMplCanvas(FigureCanvas):
                                                self.drawDataY_1)
                     self.readyToDraw = False
                     self.animation_is_running = False
+                    self.runAgain.emit()
             if self.channel_is_enabled["CH2"]:
                 if self.readyToDraw:
                     self.lines["CH1"].set_data(self.drawDataX,
                                                self.drawDataY_2)
                     self.readyToDraw = False
                     self.animation_is_running = False
+                    self.runAgain.emit()
         return tuple(self.lines.values())
 
     # demo animation function: updating plot data

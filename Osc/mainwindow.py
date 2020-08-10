@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import (
 import sys
 import ctypes
 import numpy as np
+import time
 
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
@@ -37,6 +38,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ch_connection()
         self.rsLabel.setText('Stop')
         self.startDrawing.connect(self.canvas.enable_drawing)
+        self.canvas.runAgain.connect(self.rschange)
 
         # mutex
         self.mutex = QtCore.QMutex()
@@ -106,15 +108,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def setupDso(self):
         sourceCh = self.ch_number[self._tgSource]
         trigSlope = self.slope_number[self._tgSlope]
-        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
+        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 5000)
         self.osc._uDsoSDKGetVoltDiv_(0)
 
     def process_data(self):
         if self.cptr.isInterrupted is True:
+            print(self.cptr.isInterrupted)
             self.canvas.animation_is_running = False
             self.rsLabel.setText('Stop')
             self.mutex.unlock()
             return
+        print(self.cptr.isInterrupted)
         length = self.cptr.dbWaveData_Length
         temp1 = np.arange(-length/4, length/4)
         temp2 = self.cptr.data_
@@ -128,7 +132,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.canvas.drawDataY_1 = [i*1e-6 for i in tempCH1]
         self.canvas.drawDataY_2 = [i*1e-6 for i in tempCH2]
         self.startDrawing.emit()
-        self.rsLabel.setText('Stop')
         self.mutex.unlock()
 
     # initial connections
@@ -360,12 +363,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.thr.start()
 
         else:
-            if self.mutex.tryLock() is True:
-                self.mutex.unlock()
-                return
+            # if self.mutex.tryLock() is True:
+            #     self.mutex.unlock()
+            #     print("WOWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+            #     return
+            locked = self.mutex.tryLock()
+            print("WOWWWWWWWWWWWWWWWWWWWWWWWWWWW")
             self.ceaseCapturing.emit()
             while(self.canvas.animation_is_running):
                 QtCore.QCoreApplication.processEvents()
+            if locked is True:
+                self.mutex.unlock()
 
     # function for Trigger
     def tgchange(self):

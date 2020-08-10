@@ -10,6 +10,7 @@ from PyQt5 import QtCore
 class Capt(QtCore.QObject):
 
     dataIsReady = QtCore.pyqtSignal()
+    readyToDraw = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__()
@@ -68,13 +69,6 @@ class Capt(QtCore.QObject):
         # uDsoSDKReadDbl_uv(ByVal iDev As Integer, ByRef iFlag As IntPtr,
         # ByVal lpdbDst As Double(), ByVal iProbe As Integer()) As Boolean
         self.uDsoSDKReadDbl_uv = DSOSDK_dll.uDsoSDKReadDbl_uv
-        
-         # BOOL uDsoSDKSetEdgeTrig(int iSrc, int iSlope,
-        #                         __int64 i64Threshold_uV)
-        self.uDsoSDKSetEdgeTrig = DSOSDK_dll.uDsoSDKSetEdgeTrig
-        
-        self.uDsoSDKReadIniFile = DSOSDK_dll.uDsoSDKReadIniFile
-        self.uDsoSDKGetErrorCodeEx = DSOSDK_dll.uDsoSDKGetErrorCodeEx
 
     def _uDsoSDKReadDbl_uv_(self, Dev, Flag):
         self.iDev = c_int(Dev)
@@ -82,13 +76,6 @@ class Capt(QtCore.QObject):
 
         self.uDsoSDKReadDbl_uv(self.iDev, pointer(self.iFlag),
                                self.dbWaveData, self.iProbe)
-  
-    def _uDsoSDKSetEdgeTrig_(self, Src, Slope, Threshold_uV):
-        self.iSrc = c_int(Src)  # 0 - Trigger source from channel 1.
-        self.iSlope = c_int(Slope)  #  0 - Rising edge
-        self.i64Threshold_uV = c_int64(Threshold_uV)  # 90 mV = 90 * 1e3 uV
-
-        self.uDsoSDKSetEdgeTrig(self.iSrc, self.iSlope, self.i64Threshold_uV)
 
     # BOOL uDsoSDKSetWaitMode(int iWaitMode, __int64 i64CustomWaitTime_ps)
     def _uDsoSDKSetWaitMode_(self, WaitMode, CustomWaitTime_ps = 0):      
@@ -109,22 +96,17 @@ class Capt(QtCore.QObject):
         self.uDsoSDKCaptureEx()
         iDev = c_int()
         i = 0
-        while self.uDsoSDKDataReady() == False:
+        while self.uDsoSDKDataReady() is False:
             QtCore.QCoreApplication.processEvents()
             if self.isInterrupted is True:
                 break
-            trstat = self.uDsoSDKGetStatus(iDev)
-            print(trstat)
-            # if trstat == 5:
-            #     self._uDsoSDKSetEdgeTrig_(0, 0, 50000)
-                # time.sleep(1)
-            # print(i)
-            time.sleep(0.01)
+            print(self.uDsoSDKGetStatus(iDev))
             print(i)
             i+=1
             pass
 
         if self.isInterrupted is True:
+            print("interruptinggggggggggggg")
             self.uDsoSDKStop()
             self.dataIsReady.emit()
             return
@@ -133,38 +115,6 @@ class Capt(QtCore.QObject):
         self.uDsoSDKStop()
         self.dataIsReady.emit()
 
-        
-    
-#     def SingleShot(self):
-#         self.isInterrupted = False
-#  #       self._uDsoSDKSetWaitMode_(2)
-#         filename=b'E:\\Python\\Osc\\DsoParameter.ini'
-#         print(self.uDsoSDKReadIniFile(c_char_p(filename)))
-# #        print(self.uDsoSDKGetErrorCodeEx())
-#         #self._uDsoSDKGetVoltDiv_(0)
-#         self.uDsoSDKCaptureEx()
-#         iStat = c_int()
-#         i = 0
-#         while self.uDsoSDKDataReady() is False:
-#             QtCore.QCoreApplication.processEvents()
-#             if self.isInterrupted is True:
-#                 break
-#             print("Step ", i, "; status: ", self.uDsoSDKGetStatus(iStat), "Err: ",  self.uDsoSDKGetErrorCodeEx())
-#             i+=1
-#             if i > 10000:
-#                 self.uDsoSDKReadIniFile(c_char_p(filename))
-#                 self.uDsoSDKCaptureEx()
-#                 i = 0
-#             pass
-
-#         if self.isInterrupted is True:
-#             self.uDsoSDKStop()
-#             self.dataIsReady.emit()
-#             return
-#         self._uDsoSDKReadDbl_uv_(0, 0)
-#         self.data_ = np.frombuffer(self.dbWaveData, float)
-#         self.uDsoSDKStop()
-#         self.dataIsReady.emit()
-
     def stopCapturing(self):
         self.isInterrupted = True
+        print("!changingggggggggggggggggggg")
