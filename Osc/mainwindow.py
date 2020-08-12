@@ -1,10 +1,7 @@
 from PyQt5 import QtWidgets, QtCore, uic
-from matplotlib.backends.backend_qt5agg import (
-        NavigationToolbar2QT as NavigationToolbar)
 import sys
 import ctypes
 import numpy as np
-import time
 
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
@@ -16,7 +13,9 @@ Ui_MainWindow, QMainWindow = uic.loadUiType('osc.ui')
 class MyWindow(QMainWindow, Ui_MainWindow):
 
     ceaseCapturing = QtCore.pyqtSignal()
+    restartCapturing = QtCore.pyqtSignal()
     startDrawing = QtCore.pyqtSignal()
+    ceaseFurtherCapture = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -38,7 +37,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ch_connection()
         self.rsLabel.setText('Stop')
         self.startDrawing.connect(self.canvas.enable_drawing)
-        self.canvas.runAgain.connect(self.rschange)
+        self.ceaseFurtherCapture.connect(self.canvas.stopFurtherCapture)
+        self.canvas.runAgain.connect(self.new_capture)
 
         # mutex
         self.mutex = QtCore.QMutex()
@@ -97,6 +97,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # Necessary data
         self.ch_number = {"CH1": 0, "CH2": 1}
         self.slope_number = {"Rising": 0, "Falling": 1}
+        self.first_run = True
 
     # closing'n'saving
     def closeEvent(self, event):
@@ -118,7 +119,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.rsLabel.setText('Stop')
             self.mutex.unlock()
             return
-        print(self.cptr.isInterrupted)
+       # print(self.cptr.isInterrupted)
         length = self.cptr.dbWaveData_Length
         temp1 = np.arange(-length/4, length/4)
         temp2 = self.cptr.data_
@@ -131,6 +132,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.canvas.drawDataX = [i*self.timeFactor for i in temp1]
         self.canvas.drawDataY_1 = [i*1e-6 for i in tempCH1]
         self.canvas.drawDataY_2 = [i*1e-6 for i in tempCH2]
+        self.startDrawing.emit()
+        self.mutex.unlock()
+
+    def re_capture(self):
         self.startDrawing.emit()
         self.mutex.unlock()
 
@@ -149,6 +154,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.minusVButton.clicked.connect(self.zoom_out_volts)
         self.plusSecButton.clicked.connect(self.zoom_in_seconds)
         self.minusSecButton.clicked.connect(self.zoom_out_seconds)
+        
+        self.trigEdit.returnPressed.connect(self.change_threshold)
 
     # initial global mode setting
     def set_GlMode(self):
@@ -176,9 +183,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.mplvl.addWidget(self.canvas)
         tscaleNumber = self.canvas.currentSecondsScaleNumber
         self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
-        self.toolbar = NavigationToolbar(self.canvas,
-                                         self.mplwidget, coordinates=True)
-        self.mplvl.addWidget(self.toolbar)
+   #     self.toolbar = NavigationToolbar(self.canvas,
+    #                                     self.mplwidget, coordinates=True)
+    #    self.mplvl.addWidget(self.toolbar)
 
     # checkboxes connection and binding channel labels with channel numbers
     def ch_connection(self):
@@ -209,6 +216,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.canvas.disable_channel("CH2")
             self.CH2Box.setStyleSheet("")
             self.CH2Label.clear()
+            
+    def change_threshold(self):
+        if self.osc.isDemo is False:
+            if self.first_run is False:
+                print("Stop to change")
+                self.restartCapturing.emit()
+            num = int(self.trigEdit.text())
+            sourceCh = self.ch_number[self._tgSource]
+            trigSlope = self.slope_number[self._tgSlope]
+            self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, int(num*100))
+            print("New Threshold")
 
     # zooming in/out
     def zoom_in_volts(self):
@@ -328,8 +346,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         label.clicked.connect(slot)
         label.signalClickedIsConnected = True
 
-    # function for Run/Stop
-    def rschange(self):
+    # function for capturing
+    def new_capture(self):
         if self.osc.isDemo is True:
             if self.canvas.animation_is_running is False:
                 self.canvas.animation_is_running = True
@@ -342,6 +360,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             return
         if self.canvas.animation_is_running is False:
             if self.mutex.tryLock() is False:
+                print("not good")
                 return
             self.canvas.animation_is_running = True
             self.rsLabel.setText('Run')
@@ -359,22 +378,39 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.cptr.dataIsReady.connect(self.thr.quit)
             self.cptr.dataIsReady.connect(self.cptr.deleteLater)
             self.cptr.dataIsReady.connect(self.process_data)
+            self.cptr.readyToRestart.connect(self.re_capture)
+            self.cptr.readyToRestart.connect(self.thr.quit)
+            self.cptr.readyToRestart.connect(self.cptr.deleteLater)
             self.ceaseCapturing.connect(self.cptr.stopCapturing)
+            self.restartCapturing.connect(self.cptr.newCapturing)
 
             self.thr.start()
 
         else:
-            # if self.mutex.tryLock() is True:
-            #     self.mutex.unlock()
-            #     print("WOWWWWWWWWWWWWWWWWWWWWWWWWWWW")
-            #     return
-            locked = self.mutex.tryLock()
-            print("WOWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+            if self.mutex.tryLock() is True:
+                self.mutex.unlock()
+                print("WOWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+                return
             self.ceaseCapturing.emit()
             while(self.canvas.animation_is_running):
                 QtCore.QCoreApplication.processEvents()
-            if locked is True:
+
+    # function for Run/Stop
+    def rschange(self):
+        if self.first_run is True:
+            self.canvas.readyToRunAgain = True
+            self.first_run = False
+            self.new_capture()
+        else:
+            if self.mutex.tryLock() is True:
+                self.ceaseFurtherCapture.emit()
                 self.mutex.unlock()
+            else:
+                self.ceaseCapturing.emit()
+                while(self.canvas.animation_is_running):
+                    QtCore.QCoreApplication.processEvents()
+            self.rsLabel.setText('Stop')
+            self.first_run = True
 
     # function for Trigger
     def tgchange(self):

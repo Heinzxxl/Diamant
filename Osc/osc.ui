@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1123</width>
-    <height>580</height>
+    <width>1088</width>
+    <height>610</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -17,11 +23,35 @@
    <layout class="QHBoxLayout" name="horizontalLayout_8">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="4" alignment="Qt::AlignLeft|Qt::AlignTop">
-       <widget class="QLabel" name="label_3">
+      <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
+       <widget class="QLabel" name="timeLabel">
         <property name="text">
-         <string>T Pos: 50.00%</string>
+         <string/>
         </property>
+       </widget>
+      </item>
+      <item row="24" column="0">
+       <widget class="QLabel" name="CH1Label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" rowspan="22" colspan="10">
+       <widget class="QWidget" name="mplwidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QVBoxLayout" name="mplvl"/>
        </widget>
       </item>
       <item row="1" column="3">
@@ -37,48 +67,16 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" rowspan="22" colspan="8">
-       <widget class="QWidget" name="mplwidget" native="true">
+      <item row="24" column="1">
+       <widget class="QLabel" name="CH2Label">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QVBoxLayout" name="mplvl"/>
-       </widget>
-      </item>
-      <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
-       <widget class="QLabel" name="timeLabel">
         <property name="text">
          <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
-       <widget class="QLabel" name="rsLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Run</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="7" alignment="Qt::AlignRight|Qt::AlignTop">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>100 MS/s</string>
-        </property>
-       </widget>
-      </item>
-      <item row="24" column="7" alignment="Qt::AlignRight|Qt::AlignBottom">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>0 V</string>
         </property>
        </widget>
       </item>
@@ -95,29 +93,59 @@
         </property>
        </spacer>
       </item>
-      <item row="24" column="0">
-       <widget class="QLabel" name="CH1Label">
+      <item row="1" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
+       <widget class="QLabel" name="rsLabel">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string>Run</string>
+        </property>
+       </widget>
+      </item>
+      <item row="24" column="9" alignment="Qt::AlignRight|Qt::AlignBottom">
+       <widget class="QLabel" name="label_6">
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="24" column="1">
-       <widget class="QLabel" name="CH2Label">
+      <item row="24" column="8">
+       <widget class="QLineEdit" name="trigEdit">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
-         <string/>
+         <string>50</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="24" column="7">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Trigger Threshold (mV):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>100 MS/s</string>
         </property>
        </widget>
       </item>
@@ -1544,7 +1572,7 @@ QPushButton:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1123</width>
+     <width>1088</width>
      <height>26</height>
     </rect>
    </property>

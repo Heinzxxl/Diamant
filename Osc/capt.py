@@ -11,6 +11,7 @@ class Capt(QtCore.QObject):
 
     dataIsReady = QtCore.pyqtSignal()
     readyToDraw = QtCore.pyqtSignal()
+    readyToRestart = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__()
@@ -92,6 +93,7 @@ class Capt(QtCore.QObject):
 
     def SingleShot(self):
         self.isInterrupted = False
+        self.isRestarting = False
         self._uDsoSDKSetWaitMode_(2)
         self.uDsoSDKCaptureEx()
         iDev = c_int()
@@ -99,6 +101,8 @@ class Capt(QtCore.QObject):
         while self.uDsoSDKDataReady() is False:
             QtCore.QCoreApplication.processEvents()
             if self.isInterrupted is True:
+                break
+            if self.isRestarting is True:
                 break
             print(self.uDsoSDKGetStatus(iDev))
             print(i)
@@ -110,6 +114,10 @@ class Capt(QtCore.QObject):
             self.uDsoSDKStop()
             self.dataIsReady.emit()
             return
+        if self.isRestarting is True:
+            self.uDsoSDKStop()
+            self.readyToRestart.emit()
+            return
         self._uDsoSDKReadDbl_uv_(0, 0)
         self.data_ = np.frombuffer(self.dbWaveData, float)
         self.uDsoSDKStop()
@@ -118,3 +126,7 @@ class Capt(QtCore.QObject):
     def stopCapturing(self):
         self.isInterrupted = True
         print("!changingggggggggggggggggggg")
+
+    def newCapturing(self):
+        self.isRestarting = True
+        print("ReCapture")

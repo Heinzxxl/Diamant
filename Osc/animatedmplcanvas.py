@@ -15,6 +15,7 @@ class AnimatedMplCanvas(FigureCanvas):
         self.fig = Figure()
         self.fig.set_tight_layout(True)
         self.readyToDraw = False
+        self.readyToRunAgain = True
         self.DMode = demoFlag
 
         # setting values for scaling
@@ -100,6 +101,7 @@ class AnimatedMplCanvas(FigureCanvas):
         # drawing data
         self.drawDataX = []
         self.drawDataY_1 = []
+        self.drawDataY_2 = []
 
     # animation function: updating plot data
     def animate(self, i):
@@ -110,17 +112,18 @@ class AnimatedMplCanvas(FigureCanvas):
                                                self.drawDataY_1)
                     self.lines["CH2"].set_data(self.drawDataX,
                                                self.drawDataY_2)
-                    print(len(self.drawDataX))
                     self.readyToDraw = False
                     self.animation_is_running = False
-                    self.runAgain.emit()
+                    if self.readyToRunAgain is True:
+                        self.runAgain.emit()
             if self.channel_is_enabled["CH2"]:
                 if self.readyToDraw:
                     self.lines["CH2"].set_data(self.drawDataX,
                                                self.drawDataY_2)
                     self.readyToDraw = False
                     self.animation_is_running = False
-                    self.runAgain.emit()
+                    if self.readyToRunAgain is True:
+                        self.runAgain.emit()
         return tuple(self.lines.values())
 
     # demo animation function: updating plot data
@@ -177,3 +180,6 @@ class AnimatedMplCanvas(FigureCanvas):
 
     def enable_drawing(self):
         self.readyToDraw = True
+
+    def stopFurtherCapture(self):
+        self.readyToRunAgain = False
