@@ -3,6 +3,7 @@ import sys
 import ctypes
 import numpy as np
 
+from datetime import datetime
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
 from capt import Capt
@@ -115,12 +116,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         self.save_settings()
         self.osc.uDsoSDKShutdown()
+        if self.osc.isDemo is False:
+            self.logFile.close()
         sys.exit()
 
     # setting up Dso
     def setupDso(self):
         self.change_threshold()
         self.change_volt_div()
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y-%H-%M-%S")
+        self.logFile = open('Log/' + dt_string + ".txt",'ab')
 
     def process_data(self):
         if self.cptr.isInterrupted is True:
@@ -143,6 +149,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.canvas.drawDataY_1 = [i*1e-6 for i in tempCH1]
         self.canvas.drawDataY_2 = [i*1e-6 for i in tempCH2]
         self.startDrawing.emit()
+        wr_data = np.c_[self.canvas.drawDataY_1, self.canvas.drawDataY_2]
+        np.savetxt(self.logFile, wr_data)
         self.mutex.unlock()
 
     def re_capture(self):
