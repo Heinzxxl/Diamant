@@ -32,7 +32,6 @@ class uDso(QObject):
 
         self.uDsoSDKSetVoltDiv.argtypes = (c_int, c_int)
         self.uDsoSDKSetVoltDiv.restype = c_bool
-        self._uDsoSDKSetVoltDiv_(0, 200000)
         
         self.uDsoSDKGetVoltDiv.argtypes = (c_int, POINTER(c_int))
         self.uDsoSDKGetVoltDiv.restype = c_bool

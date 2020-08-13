@@ -27,8 +27,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         # uDso
         self.osc = uDso()
-        if self.osc.isDemo is False:
-            self.setupDso()
 
         # current setup
         self.init_button_connection()
@@ -39,6 +37,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.startDrawing.connect(self.canvas.enable_drawing)
         self.ceaseFurtherCapture.connect(self.canvas.stopFurtherCapture)
         self.canvas.runAgain.connect(self.new_capture)
+        if self.osc.isDemo is False:
+            self.setupDso()
 
         # mutex
         self.mutex = QtCore.QMutex()
@@ -65,7 +65,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.beginGroup("Measure")
         self.settings.setValue("SelectedChannel", self._mrCH)
         self.settings.endGroup()
-
+        # Display conditions
+        self.settings.beginGroup("Display")
+        self.settings.setValue("CH1Probe", self._ch1Probe[0])
+        self.settings.setValue("CH2Probe", self._ch2Probe[0])
+        self.settings.endGroup()
     # loading settings
     def load_settings(self):
         # Trigger conditions
@@ -92,11 +96,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.beginGroup("Measure")
         self._mrCH = self.settings.value("SelectedChannel", "CH1")
         self.settings.endGroup()
+        # Display conditions
+        self.settings.beginGroup("Display")
+        self._ch1Probe = [self.settings.value("CH1Probe", "10x")]
+        self._ch2Probe = [self.settings.value("CH2Probe", "10x")]
+        self.settings.endGroup()
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
         # Necessary data
         self.ch_number = {"CH1": 0, "CH2": 1}
         self.slope_number = {"Rising": 0, "Falling": 1}
+        self.probe_mult = {"1x": 1, "10x": 10}
+        self.probe_num = {"CH1": self._ch1Probe, "CH2": self._ch2Probe}
+        self.ch_boxes = {"CH1": self.CH1Box, "CH2": self.CH2Box}
         self.first_run = True
 
     # closing'n'saving
@@ -107,10 +119,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # setting up Dso
     def setupDso(self):
-        sourceCh = self.ch_number[self._tgSource]
-        trigSlope = self.slope_number[self._tgSlope]
-        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 5000)
-        self.osc._uDsoSDKGetVoltDiv_(0)
+        self.change_threshold()
+        self.change_volt_div()
 
     def process_data(self):
         if self.cptr.isInterrupted is True:
@@ -138,6 +148,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def re_capture(self):
         self.startDrawing.emit()
         self.mutex.unlock()
+
 
     # initial connections
     def init_button_connection(self):
@@ -198,7 +209,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.canvas.enable_channel("CH1")
             self.CH1Box.setStyleSheet("QCheckBox{border: 2px solid " +
                                       self.canvas.colors["CH1"] + ";}")
-            vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH1"]]
+            scaleNumber = self.canvas.currentVoltsScaleNumber["CH1"]
+            textmult = self.probe_num["CH1"][0]
+            print("textmult: ", textmult)
+            if textmult == "10x":
+                vPD = self.canvas.vPDiv[scaleNumber]
+                print("10x worked")
+            if textmult == "1x":
+                vPD = self.canvas.altvPDiv[scaleNumber]
+                print("1x worked")
             self.CH1Label.setText("CH1 " + vPD)
         else:
             self.canvas.disable_channel("CH1")
@@ -210,7 +229,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.canvas.enable_channel("CH2")
             self.CH2Box.setStyleSheet("QCheckBox{border: 2px solid " +
                                       self.canvas.colors["CH2"] + ";}")
-            vPD = self.canvas.vPDiv[self.canvas.currentVoltsScaleNumber["CH2"]]
+            scaleNumber = self.canvas.currentVoltsScaleNumber["CH2"]
+            textmult = self.probe_num["CH2"][0]
+            print("textmult: ", textmult)
+            if textmult == "10x":
+                vPD = self.canvas.vPDiv[scaleNumber]
+                print("10x worked")
+            if textmult == "1x":
+                vPD = self.canvas.altvPDiv[scaleNumber]
+                print("1x worked")
             self.CH2Label.setText("CH2 " + vPD)
         else:
             self.canvas.disable_channel("CH2")
@@ -225,37 +252,45 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             num = int(self.trigEdit.text())
             sourceCh = self.ch_number[self._tgSource]
             trigSlope = self.slope_number[self._tgSlope]
-            self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, int(num*100))
-            print("New Threshold")
+            mult = self.probe_mult[self.probe_num[self._tgSource][0]]
+            level = int(num*1000/mult)
+            self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, level)
+            print("New Threshold level: ", int(num/mult))
+
+    def change_volt_div(self):
+        scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
+        textmult = self.probe_num[self._mrCH][0]
+        print("textmult: ", textmult)
+        if textmult == "10x":
+            vPD = self.canvas.vPDiv[scaleNumber]
+            print("10x worked")
+        if textmult == "1x":
+            vPD = self.canvas.altvPDiv[scaleNumber]
+            print("1x worked")
+        vPD_num = self.canvas.vPDiv_num[scaleNumber]
+        ch_num = self.canvas.channelNum[self._mrCH]
+        if self.osc.isDemo is False:
+            if self.first_run is False:
+                print("Stop to change")
+                self.restartCapturing.emit()
+            self.osc._uDsoSDKSetVoltDiv_(ch_num, int(vPD_num/10))
+            self.osc._uDsoSDKGetVoltDiv_(ch_num)
+        if self.ch_boxes[self._mrCH].isChecked():
+            self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
 
     # zooming in/out
     def zoom_in_volts(self):
         if self.canvas.channel_is_enabled[self._mrCH]:
             if self.canvas.currentVoltsScaleNumber[self._mrCH] > 0:
                 self.canvas.currentVoltsScaleNumber[self._mrCH] -= 1
-                scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
-                vPD = self.canvas.vPDiv[scaleNumber]
-                vPD_num = self.canvas.vPDiv_num[scaleNumber]
-                ch_num = self.canvas.channelNum[self._mrCH]
-                if self.osc.isDemo is False:
-                    # there must be a flag
-                    self.osc._uDsoSDKSetVoltDiv_(ch_num, int(vPD_num/10))
-                    self.osc._uDsoSDKGetVoltDiv_(0)
-                self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
+                self.change_volt_div()
                 self.canvas.rescale_axes()
 
     def zoom_out_volts(self):
         if self.canvas.channel_is_enabled[self._mrCH]:
             if self.canvas.currentVoltsScaleNumber[self._mrCH] < 11:
                 self.canvas.currentVoltsScaleNumber[self._mrCH] += 1
-                scaleNumber = self.canvas.currentVoltsScaleNumber[self._mrCH]
-                vPD = self.canvas.vPDiv[scaleNumber]
-                vPD_num = self.canvas.vPDiv_num[scaleNumber]
-                ch_num = self.canvas.channelNum[self._mrCH]
-                if self.osc.isDemo is False:
-                    self.osc._uDsoSDKSetVoltDiv_(ch_num, int(vPD_num/10))
-                    self.osc._uDsoSDKGetVoltDiv_(0)
-                self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
+                self.change_volt_div()
                 self.canvas.rescale_axes()
 
     def zoom_in_seconds(self):
@@ -477,19 +512,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def tgslot4(self):
         self._tgSource = self.dynBox4.currentText()
-        if self.osc.isDemo is True:
-            return
-        sourceCh = self.ch_number[self._tgSource]
-        trigSlope = self.slope_number[self._tgSlope]
-        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
+        self.change_threshold()
 
     def tgslot6a(self):
         self._tgSlope = self.dynBox6.currentText()
-        if self.osc.isDemo is True:
-            return
-        sourceCh = self.ch_number[self._tgSource]
-        trigSlope = self.slope_number[self._tgSlope]
-        self.osc._uDsoSDKSetEdgeTrig_(sourceCh, trigSlope, 50000)
+        self.change_threshold()
 
     def tgslot6b(self):
         self._tgVideo = self.dynBox6.currentText()
@@ -502,6 +529,30 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._GlMode = "Display"
         self.alldyndisconnect()
         self.clear_all_fields()
+        
+        if self._mrCH == "CH1":
+            self.abconnect(self.dynBox7, self.dpslot7a)
+            self.dynLabel7.setText("CH1 Probe")
+            self.dynBox7.addItems(["1x", "10x"])
+            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._ch1Probe[0]))
+
+        if self._mrCH == "CH2":
+            self.abconnect(self.dynBox7, self.dpslot7b)
+            self.dynLabel7.setText("CH2 Probe")
+            self.dynBox7.addItems(["1x", "10x"])
+            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._ch2Probe[0]))
+
+    def dpslot7a(self):
+        self._ch1Probe[0] = self.dynBox7.currentText()
+        print("current text: ", self._ch1Probe)
+        self.change_volt_div()
+        self.change_threshold()
+
+    def dpslot7b(self):
+        self._ch2Probe[0] = self.dynBox7.currentText()
+        print("current text: ", self._ch2Probe)
+        self.change_volt_div()
+        self.change_threshold()
 
     # function for Cursor
     def crchange(self):
