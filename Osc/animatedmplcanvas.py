@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.animation import FuncAnimation
 from PyQt5 import QtCore
 import numpy as np
+import time
 
 
 class AnimatedMplCanvas(FigureCanvas):
@@ -17,6 +18,7 @@ class AnimatedMplCanvas(FigureCanvas):
         self.readyToDraw = False
         self.readyToRunAgain = True
         self.DMode = demoFlag
+    #    self.startcanvas_time = time.time()
 
         # setting values for scaling
         self.voltsScaleLimits = ((-0.08, 0.08), (-0.2, 0.2), (-0.4, 0.4),
@@ -113,13 +115,14 @@ class AnimatedMplCanvas(FigureCanvas):
             if self.channel_is_enabled["CH1"]:
                 if self.readyToDraw:
                     self.lines["CH1"].set_data(self.drawDataX,
-                                               self.drawDataY_1)
+                                                self.drawDataY_1)
                     self.lines["CH2"].set_data(self.drawDataX,
-                                               self.drawDataY_2)
+                                                self.drawDataY_2)
                     self.readyToDraw = False
                     self.animation_is_running = False
                     if self.readyToRunAgain is True:
                         self.runAgain.emit()
+  #                  print("Time to draw: ", time.time() - self.startcanvas_time)
             if self.channel_is_enabled["CH2"]:
                 if self.readyToDraw:
                     self.lines["CH2"].set_data(self.drawDataX,
@@ -184,6 +187,7 @@ class AnimatedMplCanvas(FigureCanvas):
 
     def enable_drawing(self):
         self.readyToDraw = True
+ #       self.startcanvas_time = time.time()
 
     def stopFurtherCapture(self):
         self.readyToRunAgain = False

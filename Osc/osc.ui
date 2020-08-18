@@ -23,7 +23,31 @@
    <layout class="QHBoxLayout" name="horizontalLayout_8">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
+      <item row="2" column="0" rowspan="22" colspan="14">
+       <widget class="QWidget" name="mplwidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QVBoxLayout" name="mplvl"/>
+       </widget>
+      </item>
+      <item row="1" column="7">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="6" alignment="Qt::AlignRight|Qt::AlignTop">
        <widget class="QLabel" name="timeLabel">
         <property name="text">
          <string/>
@@ -43,56 +67,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" rowspan="22" colspan="10">
-       <widget class="QWidget" name="mplwidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <layout class="QVBoxLayout" name="mplvl"/>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="24" column="1">
-       <widget class="QLabel" name="CH2Label">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
        <widget class="QLabel" name="rsLabel">
         <property name="sizePolicy">
@@ -106,14 +80,7 @@
         </property>
        </widget>
       </item>
-      <item row="24" column="9" alignment="Qt::AlignRight|Qt::AlignBottom">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="24" column="8">
+      <item row="24" column="12">
        <widget class="QLineEdit" name="trigEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -135,17 +102,72 @@
         </property>
        </widget>
       </item>
-      <item row="24" column="7">
+      <item row="24" column="13" alignment="Qt::AlignRight|Qt::AlignBottom">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="24" column="11">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Trigger Threshold (mV):</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="8">
-       <widget class="QLabel" name="label_4">
+      <item row="24" column="6">
+       <widget class="QLineEdit" name="frmEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
-         <string>100 MS/s</string>
+         <string>100</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="24" column="4">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Frames per File:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="24" column="1">
+       <widget class="QLabel" name="CH2Label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>

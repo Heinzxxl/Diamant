@@ -92,22 +92,23 @@ class Capt(QtCore.QObject):
 
 
     def SingleShot(self):
+       # start_time = time.time()
         self.isInterrupted = False
         self.isRestarting = False
         self._uDsoSDKSetWaitMode_(2)
         self.uDsoSDKCaptureEx()
-        iDev = c_int()
-        i = 0
+    #    iDev = c_int()
+     #   i = 0
         while self.uDsoSDKDataReady() is False:
             QtCore.QCoreApplication.processEvents()
             if self.isInterrupted is True:
                 break
             if self.isRestarting is True:
                 break
-            print(self.uDsoSDKGetStatus(iDev))
-            print(i)
-            i+=1
-            pass
+           # a = self.uDsoSDKGetStatus(iDev)
+          #  print(a)
+           # print(i)
+           # i+=1
 
         if self.isInterrupted is True:
             print("interruptinggggggggggggg")
@@ -121,6 +122,7 @@ class Capt(QtCore.QObject):
         self._uDsoSDKReadDbl_uv_(0, 0)
         self.data_ = np.frombuffer(self.dbWaveData, float)
         self.uDsoSDKStop()
+       # print("Time to make a shot: ", time.time() - start_time)
         self.dataIsReady.emit()
 
     def stopCapturing(self):

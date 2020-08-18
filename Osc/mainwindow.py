@@ -2,7 +2,9 @@ from PyQt5 import QtWidgets, QtCore, uic
 import sys
 import ctypes
 import numpy as np
+import time
 
+from datetime import datetime
 from animatedmplcanvas import AnimatedMplCanvas
 from udso import uDso
 from capt import Capt
@@ -104,17 +106,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
         # Necessary data
+        self.i64SampleRate = ctypes.c_int()
+        self.timeAxis = np.arange(-5000, 5000)
         self.ch_number = {"CH1": 0, "CH2": 1}
         self.slope_number = {"Rising": 0, "Falling": 1}
         self.probe_mult = {"1x": 1, "10x": 10}
         self.probe_num = {"CH1": self._ch1Probe, "CH2": self._ch2Probe}
         self.ch_boxes = {"CH1": self.CH1Box, "CH2": self.CH2Box}
         self.first_run = True
+        self.first_log = True
+        self.log_stopped = False
+        self.start_time = time.time()
 
     # closing'n'saving
     def closeEvent(self, event):
         self.save_settings()
         self.osc.uDsoSDKShutdown()
+        if self.first_log is False:
+            self.logFile.close()
         sys.exit()
 
     # setting up Dso
@@ -123,26 +132,43 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.change_volt_div()
 
     def process_data(self):
+        self.start_time = time.time()
         if self.cptr.isInterrupted is True:
             print(self.cptr.isInterrupted)
             self.canvas.animation_is_running = False
             self.rsLabel.setText('Stop')
             self.mutex.unlock()
             return
-       # print(self.cptr.isInterrupted)
-        length = self.cptr.dbWaveData_Length
-        temp1 = np.arange(-length/4, length/4)
-        temp2 = self.cptr.data_
-        temp2_spl = np.split(temp2, 2)
-        tempCH1 = temp2_spl[0]
-        tempCH2 = temp2_spl[1]
-        self.i64SampleRate = ctypes.c_int()
         self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
         self.timeFactor = 1./self.i64SampleRate.value
-        self.canvas.drawDataX = [i*self.timeFactor for i in temp1]
-        self.canvas.drawDataY_1 = [i*1e-6 for i in tempCH1]
-        self.canvas.drawDataY_2 = [i*1e-6 for i in tempCH2]
+      # length = self.cptr.dbWaveData_Length
+      # print(length)
+        self.canvas.drawDataX = self.timeAxis * self.timeFactor
+        temp2_spl = np.split(self.cptr.data_, 2)
+        self.canvas.drawDataY_1 = temp2_spl[0] * 1e-6
+        self.canvas.drawDataY_2 = temp2_spl[1] * 1e-6
+       # start_time = time.time() 
+    #    print("Time to process data: ", time.time() - start_time, "\n")
         self.startDrawing.emit()
+        if self.first_log is False:
+            self.currentShot += 1
+            maxNum = int(self.frmEdit.text())
+            mult1 = self.probe_mult[self.probe_num["CH1"][0]] * 1e-6 / 10
+            mult2 = self.probe_mult[self.probe_num["CH2"][0]] * 1e-6 / 10
+            wr_data = np.c_[temp2_spl[0] * mult1, temp2_spl[1] * mult2]
+            fmt = ' '.join(['%g']*wr_data.shape[1])
+            fmt = '\n'.join([fmt]*wr_data.shape[0])
+            data = fmt % tuple(wr_data.ravel())
+            self.logFile.write(data)
+            self.logFile.write('\n')
+            # np.savetxt(self.logFile, wr_data)
+            if self.currentShot >= maxNum:
+                self.logFile.close()
+                now = datetime.now()
+                dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
+                self.logFile = open('Log/' + dt_string + ".txt",'a')
+                self.currentShot = 0
+        print("Time to process data: ", time.time() - self.start_time)
         self.mutex.unlock()
 
     def re_capture(self):
@@ -383,6 +409,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for capturing
     def new_capture(self):
+        start_time2 = time.time()
         if self.osc.isDemo is True:
             if self.canvas.animation_is_running is False:
                 self.canvas.animation_is_running = True
@@ -420,7 +447,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.restartCapturing.connect(self.cptr.newCapturing)
 
             self.thr.start()
-
+            
+            print("Time for new capture: ", time.time() - start_time2)
+            print("Time elapsed: ", time.time() - self.start_time, "\n")
         else:
             if self.mutex.tryLock() is True:
                 self.mutex.unlock()
@@ -433,6 +462,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # function for Run/Stop
     def rschange(self):
         if self.first_run is True:
+            if self.first_log is False:
+                now = datetime.now()
+                dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
+                self.logFile = open('Log/' + dt_string + ".txt",'a')
+                self.currentShot = 0
+                self.log_stopped = False
             self.canvas.readyToRunAgain = True
             self.first_run = False
             self.new_capture()
@@ -444,6 +479,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.ceaseCapturing.emit()
                 while(self.canvas.animation_is_running):
                     QtCore.QCoreApplication.processEvents()
+            if self.first_log is False:
+                self.logFile.close()
+                self.log_stopped = True
             self.rsLabel.setText('Stop')
             self.first_run = True
 
@@ -672,6 +710,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def utslot4a(self):
         self._utLog = self.dynBox4.currentText()
+        if self._utLog == "On":
+            if self.first_log is True:
+                if self.first_run is False:
+                    now = datetime.now()
+                    dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
+                    self.logFile = open('Log/' + dt_string + ".txt",'a')
+                    self.currentShot = 0
+                self.first_log = False
+        if self._utLog == "Off":
+            if self.first_log is False:
+                if self.log_stopped is False:
+                    self.logFile.close()
+                self.log_stopped = False
+                self.first_log = True
 
     def utslot5a(self):
         self.dynBox5.setCurrentIndex(0)
