@@ -76,6 +76,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.beginGroup("Acquire")
         self.settings.setValue("Capture", self._aqCapt)
         self.settings.endGroup()
+        # Logging conditions
+        self.settings.beginGroup("Directory")
+        self.settings.setValue("LogFolder", self._logDir)
+        self.settings.endGroup()
 
     # loading settings
     def load_settings(self):
@@ -113,6 +117,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._aqCapt = self.settings.value("Capture", "Sample")
         self._aqFMode = "Off"
         self.settings.endGroup()
+        # Logging conditions
+        self.settings.beginGroup("Directory")
+        self._logDir = self.settings.value("LogFolder", "Log")
+        self.logEdit.setText(self._logDir)
+        self.settings.endGroup()
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
         # Necessary data
@@ -145,6 +154,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def setupDso(self):
         self.change_threshold()
         self.change_volt_div()
+
+    def change_log_dir(self):
+        self._logDir = self.logEdit.text()
 
     def process_data(self):
         if self.cptr.isInterrupted is True:
@@ -193,7 +205,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def accumulate_data(self):
         print("Entered 1")
-        new_capture_started = False
+        #new_capture_started = False
         temp2_spl = np.split(self.cptr.data_, 2)
         self.temp_arrayCH1 += temp2_spl[0]
         self.temp_arrayCH2 += temp2_spl[1]
@@ -207,9 +219,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.canvas.drawDataX = self.timeAxis * self.timeFactor
                 self.canvas.drawDataY_1 = self.temp_arrayCH1 * 1e-6 / accumNum
                 self.canvas.drawDataY_2 = self.temp_arrayCH2 * 1e-6 / accumNum
-                self.startDrawing.emit()
                 print("Drawing")
-                new_capture_started = True
+              #  new_capture_started = True
             if self.first_log is False:
                 mult1 = self.probe_mult[self.probe_num["CH1"][0]] * 1e-6 / 10
                 mult2 = self.probe_mult[self.probe_num["CH2"][0]] * 1e-6 / 10
@@ -231,11 +242,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.temp_arrayCH1.fill(0)
             self.temp_arrayCH2.fill(0)
         print("Entered 2")
-        if new_capture_started is False:
+        if self._aqFMode == "Off":
+            self.startDrawing.emit()
+        if self._aqFMode == "On":
             self.canvas.animation_is_running = False
         self.mutex.unlock()
-        if new_capture_started is False:
-            print("Entered 3")
+        if self._aqFMode == "On":
             self.new_capture()
 
     def re_capture(self):
@@ -259,6 +271,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.minusSecButton.clicked.connect(self.zoom_out_seconds)
 
         self.trigEdit.returnPressed.connect(self.change_threshold)
+        self.logEdit.returnPressed.connect(self.change_log_dir)
 
     # initial global mode setting
     def set_GlMode(self):
@@ -340,8 +353,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
         self.logFile = open(self.logEdit.text() + "/" + dt_string +
                             ".txt", 'a')
+        self._logDir = self.logEdit.text()
         self.logFile.write("Number of points in one frame: " +
                            str(10000) + '\n')
+        if self._aqCapt == "Accumulation":
+            self.logFile.write("Number of pulses accumulated: " +
+                               self.frmEdit.text() + '\n')
+        if self._aqCapt == "Average":
+            self.logFile.write("Number of pulses averaged: " +
+                               self.frmEdit.text() + '\n')
         self.logFile.write("Time step (s): " + "%g" % time_step + "\n")
         self.logFile.write("    CH1 \t CH2 \n")
 
