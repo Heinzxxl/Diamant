@@ -92,23 +92,28 @@ class Capt(QtCore.QObject):
 
 
     def SingleShot(self):
-       # start_time = time.time()
+        start_time = time.time()
         self.isInterrupted = False
         self.isRestarting = False
         self._uDsoSDKSetWaitMode_(2)
+        startcapt_time = time.time()
         self.uDsoSDKCaptureEx()
-    #    iDev = c_int()
+        print("Time to do a capt: ", time.time() - startcapt_time)
+        iDev = c_int()
      #   i = 0
+        start_time2 = time.time()
         while self.uDsoSDKDataReady() is False:
             QtCore.QCoreApplication.processEvents()
             if self.isInterrupted is True:
                 break
             if self.isRestarting is True:
                 break
-           # a = self.uDsoSDKGetStatus(iDev)
-          #  print(a)
+            a = self.uDsoSDKGetStatus(iDev)
+            print(a)
            # print(i)
            # i+=1
+        print("Time to make a shot: ", time.time() - start_time)
+        print("True Time to make a shot: ", time.time() - start_time2)
 
         if self.isInterrupted is True:
             print("interruptinggggggggggggg")

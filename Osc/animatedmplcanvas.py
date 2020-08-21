@@ -115,22 +115,26 @@ class AnimatedMplCanvas(FigureCanvas):
             if self.channel_is_enabled["CH1"]:
                 if self.readyToDraw:
                     self.lines["CH1"].set_data(self.drawDataX,
-                                                self.drawDataY_1)
-                    self.lines["CH2"].set_data(self.drawDataX,
-                                                self.drawDataY_2)
+                                               self.drawDataY_1)
+                    if self.channel_is_enabled["CH2"]:
+                        self.lines["CH2"].set_data(self.drawDataX,
+                                                   self.drawDataY_2)
                     self.readyToDraw = False
                     self.animation_is_running = False
                     if self.readyToRunAgain is True:
                         self.runAgain.emit()
-  #                  print("Time to draw: ", time.time() - self.startcanvas_time)
+                    print("Time to draw: ", time.time() - self.startcanvas_time)
             if self.channel_is_enabled["CH2"]:
                 if self.readyToDraw:
                     self.lines["CH2"].set_data(self.drawDataX,
                                                self.drawDataY_2)
+                    if self.channel_is_enabled["CH1"]:
+                        self.lines["CH1"].set_data(self.drawDataX,
+                                                   self.drawDataY_1)
                     self.readyToDraw = False
                     self.animation_is_running = False
                     if self.readyToRunAgain is True:
-                        self.runAgain.emit()
+                         self.runAgain.emit()
         return tuple(self.lines.values())
 
     # demo animation function: updating plot data
@@ -187,7 +191,7 @@ class AnimatedMplCanvas(FigureCanvas):
 
     def enable_drawing(self):
         self.readyToDraw = True
- #       self.startcanvas_time = time.time()
+        self.startcanvas_time = time.time()
 
     def stopFurtherCapture(self):
         self.readyToRunAgain = False

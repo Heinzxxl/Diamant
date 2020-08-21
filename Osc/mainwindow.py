@@ -72,6 +72,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue("CH1Probe", self._ch1Probe[0])
         self.settings.setValue("CH2Probe", self._ch2Probe[0])
         self.settings.endGroup()
+        # Acquire conditions
+        self.settings.beginGroup("Acquire")
+        self.settings.setValue("Capture", self._aqCapt)
+        self.settings.endGroup()
+
     # loading settings
     def load_settings(self):
         # Trigger conditions
@@ -103,9 +108,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._ch1Probe = [self.settings.value("CH1Probe", "10x")]
         self._ch2Probe = [self.settings.value("CH2Probe", "10x")]
         self.settings.endGroup()
+        # Acquire conditions
+        self.settings.beginGroup("Acquire")
+        self._aqCapt = self.settings.value("Capture", "Sample")
+        self._aqFMode = "Off"
+        self.settings.endGroup()
         # Global Mode condition
         self._GlMode = self.settings.value("CurrentMode", "Trigger")
         # Necessary data
+        self.temp_arrayCH1 = np.zeros(10000)
+        self.temp_arrayCH2 = np.zeros(10000)
         self.i64SampleRate = ctypes.c_int()
         self.timeAxis = np.arange(-5000, 5000)
         self.ch_number = {"CH1": 0, "CH2": 1}
@@ -116,6 +128,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.first_run = True
         self.first_log = True
         self.log_stopped = False
+        self.accum_running = False
+        self.accum_shot = 0
         self.start_time = time.time()
 
     # closing'n'saving
@@ -123,7 +137,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.save_settings()
         self.osc.uDsoSDKShutdown()
         if self.first_log is False:
-            self.logFile.close()
+            if self._aqCapt == "Sample":
+                self.logFile.close()
         sys.exit()
 
     # setting up Dso
@@ -132,49 +147,100 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.change_volt_div()
 
     def process_data(self):
-        self.start_time = time.time()
         if self.cptr.isInterrupted is True:
             print(self.cptr.isInterrupted)
             self.canvas.animation_is_running = False
             self.rsLabel.setText('Stop')
             self.mutex.unlock()
             return
-        self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
-        self.timeFactor = 1./self.i64SampleRate.value
-      # length = self.cptr.dbWaveData_Length
-      # print(length)
-        self.canvas.drawDataX = self.timeAxis * self.timeFactor
+        if not self._aqCapt == "Sample":
+            self.accumulate_data()
+            return
         temp2_spl = np.split(self.cptr.data_, 2)
-        self.canvas.drawDataY_1 = temp2_spl[0] * 1e-6
-        self.canvas.drawDataY_2 = temp2_spl[1] * 1e-6
-       # start_time = time.time() 
-    #    print("Time to process data: ", time.time() - start_time, "\n")
-        self.startDrawing.emit()
+        if self._aqFMode == "Off":
+            self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
+            self.timeFactor = 1./self.i64SampleRate.value
+            self.canvas.drawDataX = self.timeAxis * self.timeFactor
+            self.canvas.drawDataY_1 = temp2_spl[0] * 1e-6
+            self.canvas.drawDataY_2 = temp2_spl[1] * 1e-6
+            self.canvas.startcanvas_time = time.time()
+            self.startDrawing.emit()
         if self.first_log is False:
             self.currentShot += 1
             maxNum = int(self.frmEdit.text())
             mult1 = self.probe_mult[self.probe_num["CH1"][0]] * 1e-6 / 10
             mult2 = self.probe_mult[self.probe_num["CH2"][0]] * 1e-6 / 10
             wr_data = np.c_[temp2_spl[0] * mult1, temp2_spl[1] * mult2]
-            fmt = ' '.join(['%g']*wr_data.shape[1])
+            if self._aqFMode == "Off":
+                fmt = ' '.join(['%.6e']*wr_data.shape[1])
+            if self._aqFMode == "On":
+                fmt = ' '.join(['%g']*wr_data.shape[1])
             fmt = '\n'.join([fmt]*wr_data.shape[0])
             data = fmt % tuple(wr_data.ravel())
+            start_time2 = time.time()
             self.logFile.write(data)
             self.logFile.write('\n')
-            # np.savetxt(self.logFile, wr_data)
+            print("Time to write data: ", time.time() - start_time2)
             if self.currentShot >= maxNum:
                 self.logFile.close()
-                now = datetime.now()
-                dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
-                self.logFile = open('Log/' + dt_string + ".txt",'a')
+                self.open_logfile()
                 self.currentShot = 0
-        print("Time to process data: ", time.time() - self.start_time)
+        if self._aqFMode == "On":
+            self.canvas.animation_is_running = False
         self.mutex.unlock()
+        if self._aqFMode == "On":
+            self.new_capture()
+
+    def accumulate_data(self):
+        print("Entered 1")
+        new_capture_started = False
+        temp2_spl = np.split(self.cptr.data_, 2)
+        self.temp_arrayCH1 += temp2_spl[0]
+        self.temp_arrayCH2 += temp2_spl[1]
+        self.accum_shot += 1
+        accumNum = int(self.frmEdit.text())
+        if self.accum_shot >= accumNum:
+            if self._aqFMode == "Off":
+                ct_pointer = ctypes.pointer(self.i64SampleRate)
+                self.osc.uDsoSDKGetSampleRate(ct_pointer)
+                self.timeFactor = 1./self.i64SampleRate.value
+                self.canvas.drawDataX = self.timeAxis * self.timeFactor
+                self.canvas.drawDataY_1 = self.temp_arrayCH1 * 1e-6 / accumNum
+                self.canvas.drawDataY_2 = self.temp_arrayCH2 * 1e-6 / accumNum
+                self.startDrawing.emit()
+                print("Drawing")
+                new_capture_started = True
+            if self.first_log is False:
+                mult1 = self.probe_mult[self.probe_num["CH1"][0]] * 1e-6 / 10
+                mult2 = self.probe_mult[self.probe_num["CH2"][0]] * 1e-6 / 10
+                wr_data = np.c_[self.temp_arrayCH1 * mult1,
+                                self.temp_arrayCH2 * mult2]
+                if self._aqCapt == "Average":
+                    wr_data /= accumNum
+                if self._aqFMode == "Off":
+                    fmt = ' '.join(['%.6e']*wr_data.shape[1])
+                if self._aqFMode == "On":
+                    fmt = ' '.join(['%g']*wr_data.shape[1])
+                fmt = '\n'.join([fmt]*wr_data.shape[0])
+                data = fmt % tuple(wr_data.ravel())
+                self.open_logfile()
+                self.logFile.write(data)
+                self.logFile.write('\n')
+                self.logFile.close()
+            self.accum_shot = 0
+            self.temp_arrayCH1.fill(0)
+            self.temp_arrayCH2.fill(0)
+        print("Entered 2")
+        if new_capture_started is False:
+            self.canvas.animation_is_running = False
+        self.mutex.unlock()
+        if new_capture_started is False:
+            print("Entered 3")
+            self.new_capture()
 
     def re_capture(self):
         self.startDrawing.emit()
         self.mutex.unlock()
-
 
     # initial connections
     def init_button_connection(self):
@@ -191,7 +257,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.minusVButton.clicked.connect(self.zoom_out_volts)
         self.plusSecButton.clicked.connect(self.zoom_in_seconds)
         self.minusSecButton.clicked.connect(self.zoom_out_seconds)
-        
+
         self.trigEdit.returnPressed.connect(self.change_threshold)
 
     # initial global mode setting
@@ -220,9 +286,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.mplvl.addWidget(self.canvas)
         tscaleNumber = self.canvas.currentSecondsScaleNumber
         self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
-   #     self.toolbar = NavigationToolbar(self.canvas,
-    #                                     self.mplwidget, coordinates=True)
-    #    self.mplvl.addWidget(self.toolbar)
 
     # checkboxes connection and binding channel labels with channel numbers
     def ch_connection(self):
@@ -269,7 +332,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.canvas.disable_channel("CH2")
             self.CH2Box.setStyleSheet("")
             self.CH2Label.clear()
-            
+
+    def open_logfile(self):
+        self.osc.uDsoSDKGetSampleRate(ctypes.pointer(self.i64SampleRate))
+        time_step = 1. / self.i64SampleRate.value
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
+        self.logFile = open(self.logEdit.text() + "/" + dt_string +
+                            ".txt", 'a')
+        self.logFile.write("Number of points in one frame: " +
+                           str(10000) + '\n')
+        self.logFile.write("Time step (s): " + "%g" % time_step + "\n")
+        self.logFile.write("    CH1 \t CH2 \n")
+
     def change_threshold(self):
         if self.osc.isDemo is False:
             if self.first_run is False:
@@ -304,6 +379,28 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.ch_boxes[self._mrCH].isChecked():
             self.CHLabels[self._mrCH].setText(self._mrCH + " " + vPD)
 
+    def change_sec_div(self):
+        tscaleNumber = self.canvas.currentSecondsScaleNumber
+        sampleRate = self.canvas.sPDiv_num[tscaleNumber]
+        new_file_needed = False
+        if self.first_log is False:
+            if self.first_run is False:
+                self.first_log = True
+                new_file_needed = True
+        if self.osc.isDemo is False:
+            self.osc._uDsoSDKSetSampleRate_(sampleRate)
+        if new_file_needed is True:
+            if self._aqCapt == "Sample":
+                self.logFile.close()
+                self.open_logfile()
+                self.currentShot = 0
+            else:
+                self.accum_shot = 0
+                self.temp_arrayCH1.fill(0)
+                self.temp_arrayCH2.fill(0)
+            self.first_log = False
+        self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
+
     # zooming in/out
     def zoom_in_volts(self):
         if self.canvas.channel_is_enabled[self._mrCH]:
@@ -322,21 +419,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def zoom_in_seconds(self):
         if self.canvas.currentSecondsScaleNumber > 0:
             self.canvas.currentSecondsScaleNumber -= 1
-            tscaleNumber = self.canvas.currentSecondsScaleNumber
-            sampleRate = self.canvas.sPDiv_num[tscaleNumber]
-            if self.osc.isDemo is False:
-                self.osc._uDsoSDKSetSampleRate_(sampleRate)
-            self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
+            self.change_sec_div()
             self.canvas.rescale_axes()
 
     def zoom_out_seconds(self):
         if self.canvas.currentSecondsScaleNumber < 26:
             self.canvas.currentSecondsScaleNumber += 1
-            tscaleNumber = self.canvas.currentSecondsScaleNumber
-            sampleRate = self.canvas.sPDiv_num[tscaleNumber]
-            if self.osc.isDemo is False:
-                self.osc._uDsoSDKSetSampleRate_(sampleRate)
-            self.timeLabel.setText("M " + self.canvas.sPDiv[tscaleNumber])
+            self.change_sec_div()
             self.canvas.rescale_axes()
 
     # box disconnection
@@ -409,12 +498,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # function for capturing
     def new_capture(self):
-        start_time2 = time.time()
+        start_time5 = time.time()
         if self.osc.isDemo is True:
             if self.canvas.animation_is_running is False:
                 self.canvas.animation_is_running = True
                 self.rsLabel.setText('Run')
-                self.canvas.saved_lines_data = {"CH1": [[], []], 
+                self.canvas.saved_lines_data = {"CH1": [[], []],
                                                 "CH2": [[], []]}
             else:
                 self.canvas.animation_is_running = False
@@ -447,9 +536,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.restartCapturing.connect(self.cptr.newCapturing)
 
             self.thr.start()
-            
-            print("Time for new capture: ", time.time() - start_time2)
-            print("Time elapsed: ", time.time() - self.start_time, "\n")
+
+            print("Time for new capture: ", time.time() - start_time5)
         else:
             if self.mutex.tryLock() is True:
                 self.mutex.unlock()
@@ -463,11 +551,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def rschange(self):
         if self.first_run is True:
             if self.first_log is False:
-                now = datetime.now()
-                dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
-                self.logFile = open('Log/' + dt_string + ".txt",'a')
-                self.currentShot = 0
-                self.log_stopped = False
+                if self._aqCapt == "Sample":
+                    self.open_logfile()
+                    self.currentShot = 0
+                    self.log_stopped = False
             self.canvas.readyToRunAgain = True
             self.first_run = False
             self.new_capture()
@@ -480,9 +567,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 while(self.canvas.animation_is_running):
                     QtCore.QCoreApplication.processEvents()
             if self.first_log is False:
-                self.logFile.close()
-                self.log_stopped = True
+                if self._aqCapt == "Sample":
+                    self.logFile.close()
+                    self.log_stopped = True
             self.rsLabel.setText('Stop')
+            self.accum_shot = 0
+            self.temp_arrayCH1.fill(0)
+            self.temp_arrayCH2.fill(0)
             self.first_run = True
 
     # function for Trigger
@@ -567,18 +658,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._GlMode = "Display"
         self.alldyndisconnect()
         self.clear_all_fields()
-        
+
         if self._mrCH == "CH1":
             self.abconnect(self.dynBox7, self.dpslot7a)
             self.dynLabel7.setText("CH1 Probe")
             self.dynBox7.addItems(["1x", "10x"])
-            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._ch1Probe[0]))
+            cur_index = self.dynBox7.findText(self._ch1Probe[0])
+            self.dynBox7.setCurrentIndex(cur_index)
 
         if self._mrCH == "CH2":
             self.abconnect(self.dynBox7, self.dpslot7b)
             self.dynLabel7.setText("CH2 Probe")
             self.dynBox7.addItems(["1x", "10x"])
-            self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._ch2Probe[0]))
+            cur_index = self.dynBox7.findText(self._ch2Probe[0])
+            self.dynBox7.setCurrentIndex(cur_index)
 
     def dpslot7a(self):
         self._ch1Probe[0] = self.dynBox7.currentText()
@@ -713,15 +806,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self._utLog == "On":
             if self.first_log is True:
                 if self.first_run is False:
-                    now = datetime.now()
-                    dt_string = now.strftime("%d-%m-%Y-%H-%M-%S-%f")
-                    self.logFile = open('Log/' + dt_string + ".txt",'a')
-                    self.currentShot = 0
+                    if self._aqCapt == "Sample":
+                        self.open_logfile()
+                        self.currentShot = 0
                 self.first_log = False
         if self._utLog == "Off":
             if self.first_log is False:
                 if self.log_stopped is False:
-                    self.logFile.close()
+                    if self._aqCapt == "Sample":
+                        self.logFile.close()
                 self.log_stopped = False
                 self.first_log = True
 
@@ -766,6 +859,42 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._GlMode = "Acquire"
         self.alldyndisconnect()
         self.clear_all_fields()
+
+        self.abconnect(self.dynBox1, self.aqslot1)
+        self.dynLabel1.setText("Capture")
+        self.dynBox1.addItems(["Sample", "Accumulation", "Average"])
+        self.dynBox1.setCurrentIndex(self.dynBox1.findText(self._aqCapt))
+
+        self.abconnect(self.dynBox7, self.aqslot7)
+        self.dynLabel7.setText("Fast Mode")
+        self.dynBox7.addItems(["On", "Off"])
+        self.dynBox7.setCurrentIndex(self.dynBox7.findText(self._aqFMode))
+
+    def aqslot1(self):
+        new_file_needed = False
+        if self.first_log is False:
+            if self.first_run is False:
+                self.first_log = True
+                if self._aqCapt == "Sample":
+                    self.logFile.close()
+                    self.currentShot = 0
+                else:
+                    self.accum_shot = 0
+                    self.temp_arrayCH1.fill(0)
+                    self.temp_arrayCH2.fill(0)
+                new_file_needed = True
+        self._aqCapt = self.dynBox1.currentText()
+        if new_file_needed is True:
+            if self._aqCapt == "Sample":
+                self.open_logfile()
+            self.first_log = False
+
+    def aqslot7(self):
+        self._aqFMode = self.dynBox7.currentText()
+        if self._aqFMode == "On":
+            self.canvas.anim.event_source.stop()
+        if self._aqFMode == "Off":
+            self.canvas.anim.event_source.start()
 
 
 app = QtWidgets.QApplication([])
